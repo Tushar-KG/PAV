@@ -1,4 +1,4 @@
-# PAV — Play Any Video
+ # PAV — Play Any Video
 
 <p align="center">
   <img src="logo.svg" alt="PAV Logo" width="160" height="160" />

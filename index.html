@@ -6,11 +6,12 @@
   <title>PAV — Play Any Video</title>
   <meta name="description" content="PAV (Play Any Video) - A complete conceptual overhaul of VLC Media Player featuring Juxtopposed UX principles, electric cyan & indigo styling, thick scrubbing seekbar, and visual sync timeline.">
   
-  <!-- Modern Google Fonts & PAV Favicon -->
+  <!-- Security Policy for Media Playback & Local Execution -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; media-src 'self' blob: file: data: https: http:; img-src 'self' blob: file: data: https: http:; connect-src 'self' blob: file: https: http:;">
+
+  <!-- Local Offline Fonts & PAV Favicon -->
   <link rel="icon" type="image/svg+xml" href="logo.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/fonts.css">
   
   <!-- CSS Stylesheets -->
   <link rel="stylesheet" href="css/variables.css">
@@ -43,19 +44,19 @@
               <div class="dropdown-item" data-action="open-file">
                 <span>Open File...</span><span class="keycap">Ctrl+O</span>
               </div>
-              <div class="dropdown-item" data-action="open-media">
+              <div class="dropdown-item" data-action="open-media" data-tab="network">
                 <span>Open Network Stream...</span><span class="keycap">Ctrl+N</span>
               </div>
-              <div class="dropdown-item" data-action="open-media">
-                <span>Capture Device...</span><span class="keycap">Ctrl+C</span>
+              <div class="dropdown-item" data-action="open-media" data-tab="capture">
+                <span>Capture Device...</span><span class="keycap">Ctrl+Shift+C</span>
               </div>
               <div class="dropdown-separator"></div>
               <div class="dropdown-item" data-action="snapshot">
-                <span>Take Snapshot</span><span class="keycap">S</span>
+                <span>Take Snapshot</span><span class="keycap">Shift+S</span>
               </div>
               <div class="dropdown-separator"></div>
               <div class="dropdown-item" data-action="about">
-                <span>About VLC Plus</span>
+                <span>About PAV</span>
               </div>
             </div>
           </div>
@@ -63,16 +64,16 @@
           <div class="menu-item">
             <button class="menu-trigger">Playback</button>
             <div class="menu-dropdown">
-              <div class="dropdown-item" onclick="window.vlcApp.player.togglePlay()">
+              <div class="dropdown-item" data-action="play-pause">
                 <span>Play / Pause</span><span class="keycap">Space</span>
               </div>
-              <div class="dropdown-item" onclick="window.vlcApp.player.stop()">
+              <div class="dropdown-item" data-action="stop">
                 <span>Stop</span><span class="keycap">S</span>
               </div>
-              <div class="dropdown-item" onclick="window.vlcApp.player.queue.playPrev()">
+              <div class="dropdown-item" data-action="prev-track">
                 <span>Previous Track</span><span class="keycap">P</span>
               </div>
-              <div class="dropdown-item" onclick="window.vlcApp.player.queue.playNext()">
+              <div class="dropdown-item" data-action="next-track">
                 <span>Next Track</span><span class="keycap">N</span>
               </div>
               <div class="dropdown-separator"></div>
@@ -92,13 +93,13 @@
                 <span>10-Band Graphic Equalizer</span><span class="keycap">Ctrl+E</span>
               </div>
               <div class="dropdown-separator"></div>
-              <div class="dropdown-item" onclick="window.vlcApp.player.adjustVolume(0.1)">
+              <div class="dropdown-item" data-action="vol-up">
                 <span>Volume Boost (+10%)</span><span class="keycap">↑</span>
               </div>
-              <div class="dropdown-item" onclick="window.vlcApp.player.adjustVolume(-0.1)">
+              <div class="dropdown-item" data-action="vol-down">
                 <span>Volume Decrease (-10%)</span><span class="keycap">↓</span>
               </div>
-              <div class="dropdown-item" onclick="window.vlcApp.player.toggleMute()">
+              <div class="dropdown-item" data-action="mute">
                 <span>Mute Audio</span><span class="keycap">M</span>
               </div>
             </div>
@@ -111,13 +112,13 @@
                 <span>Fullscreen</span><span class="keycap">F</span>
               </div>
               <div class="dropdown-item" data-action="pip">
-                <span>Picture in Picture</span><span class="keycap">P</span>
+                <span>Picture in Picture</span><span class="keycap">I</span>
               </div>
               <div class="dropdown-item" data-action="equalizer">
                 <span>Adjust Video Effects & Filters...</span>
               </div>
               <div class="dropdown-separator"></div>
-              <div class="dropdown-item" onclick="window.vlcApp.player.videoFX.takeSnapshot()">
+              <div class="dropdown-item" data-action="snapshot">
                 <span>Save Frame Snapshot</span><span class="keycap">Shift+S</span>
               </div>
             </div>
@@ -132,14 +133,14 @@
               <div class="dropdown-item" data-action="batch-subtitles">
                 <span>Batch Subtitle Matcher...</span><span class="keycap">Ctrl+B</span>
               </div>
-              <div class="dropdown-item" onclick="document.getElementById('sub-file-input').click()">
+              <div class="dropdown-item" data-action="add-sub-file">
                 <span>Add Subtitle File (.srt / .vtt)...</span>
               </div>
               <div class="dropdown-separator"></div>
-              <div class="dropdown-item" onclick="window.vlcApp.subtitles.nudgeSyncOffset(-50)">
+              <div class="dropdown-item" data-action="sub-delay-minus">
                 <span>Subtitle Delay -50ms</span><span class="keycap">G</span>
               </div>
-              <div class="dropdown-item" onclick="window.vlcApp.subtitles.nudgeSyncOffset(50)">
+              <div class="dropdown-item" data-action="sub-delay-plus">
                 <span>Subtitle Delay +50ms</span><span class="keycap">H</span>
               </div>
             </div>
@@ -155,7 +156,7 @@
               <div class="dropdown-item" data-action="settings">
                 <span>Preferences & Settings (10 Categories)</span><span class="keycap">Ctrl+P</span>
               </div>
-              <div class="dropdown-item" data-action="settings">
+              <div class="dropdown-item" data-action="settings" data-tab="controls">
                 <span>Hotkey Manager...</span><span class="keycap">Ctrl+H</span>
               </div>
             </div>
@@ -165,13 +166,13 @@
 
       <!-- Current Media Title Display & Codec Pill -->
       <div class="header-center">
-        <span class="media-title-display" id="current-media-title">Big Buck Bunny (4K Ultra HD)</span>
-        <span class="badge badge-orange media-codec-badge" id="current-media-codec">4K • H.264 • AAC 5.1 • 60fps</span>
+        <span class="media-title-display" id="current-media-title">PAV — Play Any Video</span>
+        <span class="badge badge-orange media-codec-badge" id="current-media-codec" style="display: none;">Ready</span>
       </div>
 
       <!-- Quick Action Buttons & Window Controls -->
       <div class="header-right">
-        <button class="header-action-btn" id="btn-snapshot-quick" data-tooltip="Capture Frame Snapshot (S)">
+        <button class="header-action-btn" id="btn-snapshot-quick" data-tooltip="Capture Frame Snapshot (Shift+S)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
             <circle cx="12" cy="13" r="4"></circle>
@@ -217,7 +218,18 @@
 
     <!-- Main Player Viewport -->
     <main class="player-viewport" id="player-viewport">
-      <video id="main-video" playsinline crossorigin="anonymous"></video>
+      <video id="main-video" playsinline></video>
+
+      <!-- Clickable Empty State (When no media loaded) -->
+      <div class="player-empty-state" id="player-empty-state">
+        <div class="empty-state-btn" id="empty-state-open-btn" data-action="open-file">
+          <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <div class="empty-state-title">Open Media or Drop Files Here</div>
+          <div class="empty-state-subtitle">Click to choose a video, audio, or subtitle file</div>
+        </div>
+      </div>
 
       <!-- Drag & Drop Overlay Zone -->
       <div class="drag-drop-overlay" id="drag-drop-overlay">
@@ -480,10 +492,11 @@
     <!-- Audio Track Popover -->
     <div class="quick-popover" id="popover-audio">
       <div class="popover-header">Audio Stream & Equalizer</div>
-      <button class="popover-option-btn selected">Track 1: English (Stereo 2.0)</button>
-      <button class="popover-option-btn">Track 2: Director Commentary</button>
+      <div id="audio-tracks-list">
+        <button class="popover-option-btn selected">Default Audio Output</button>
+      </div>
       <div class="dropdown-separator"></div>
-      <button class="popover-option-btn" onclick="window.vlcApp.ui.openModal('modal-equalizer-fx'); window.vlcApp.ui.closeAllPopovers();">
+      <button class="popover-option-btn" data-action="equalizer">
         <span>Open Graphic Equalizer...</span>
       </button>
     </div>
@@ -492,10 +505,10 @@
     <div class="quick-popover" id="popover-subtitles">
       <div class="popover-header">Subtitles Management</div>
       <button class="popover-option-btn selected" id="popover-sub-toggle">Disable Subtitles</button>
-      <button class="popover-option-btn" onclick="window.vlcApp.ui.openModal('modal-visual-sync'); window.vlcApp.ui.closeAllPopovers();">
+      <button class="popover-option-btn" data-action="sync-timeline">
         <span>Visual Sync Timeline...</span>
       </button>
-      <button class="popover-option-btn" onclick="document.getElementById('sub-file-input').click()">
+      <button class="popover-option-btn" data-action="add-sub-file">
         <span>Upload .SRT / .VTT File</span>
       </button>
       <input type="file" id="sub-file-input" accept=".srt,.vtt,.sub" style="display: none;" />
@@ -523,7 +536,7 @@
         <div class="modal-body">
           <!-- Tab 1: Local File -->
           <div class="open-media-tab-panel" id="tab-open-file" style="display: flex; flex-direction: column; gap: 16px;">
-            <div style="border: 2px dashed var(--border-medium); border-radius: var(--radius-md); padding: 32px; text-align: center; cursor: pointer;" onclick="document.getElementById('local-file-picker').click()">
+            <div id="modal-select-files-dropzone" style="border: 2px dashed var(--border-medium); border-radius: var(--radius-md); padding: 32px; text-align: center; cursor: pointer;">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--vlc-orange)" stroke-width="2" style="margin-bottom: 8px;">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="17 8 12 3 7 8"></polyline>
@@ -532,22 +545,22 @@
               <div style="font-weight: 600; margin-bottom: 4px;">Click to Select Files or Drag & Drop</div>
               <div style="font-size: 12px; color: var(--text-muted);">Supports MP4, WebM, MKV, AVI, MP3, FLAC, WAV, SRT</div>
             </div>
-            <input type="file" id="local-file-picker" multiple style="display: none;" onchange="window.vlcApp.player.handleDroppedFiles(this.files); window.vlcApp.ui.closeAllModals();" />
+            <input type="file" id="local-file-picker" multiple style="display: none;" />
           </div>
 
           <!-- Tab 2: Network Stream -->
           <div class="open-media-tab-panel" id="tab-open-network" style="display: none; flex-direction: column; gap: 14px;">
             <p style="font-size: 13px; color: var(--text-secondary);">Enter a network URL (HTTP/HTTPS, HLS .m3u8, RTSP, or direct MP4/WebM stream):</p>
             <form id="network-stream-form" style="display: flex; gap: 8px;">
-              <input type="url" id="network-stream-url" placeholder="https://example.com/live/stream.m3u8" style="flex: 1;" required />
+              <input type="text" id="network-stream-url" placeholder="https://example.com/live/stream.m3u8" style="flex: 1;" required />
               <button type="submit" class="btn-primary">Play Stream</button>
             </form>
             <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
               <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Quick Presets:</span>
-              <button class="btn-secondary" style="text-align: left;" onclick="document.getElementById('network-stream-url').value='https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4'">
+              <button type="button" class="btn-secondary" style="text-align: left;" data-stream-preset="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4">
                 Tears of Steel 4K (Google Storage Direct)
               </button>
-              <button class="btn-secondary" style="text-align: left;" onclick="document.getElementById('network-stream-url').value='https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4'">
+              <button type="button" class="btn-secondary" style="text-align: left;" data-stream-preset="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4">
                 Elephants Dream 1080p (Google Storage Direct)
               </button>
             </div>
@@ -818,14 +831,14 @@
                       <span class="setting-label">Resume playback position</span>
                       <span class="setting-desc">Ask to continue where you left off on previously played files</span>
                     </div>
-                    <select><option>Always</option><option>Ask</option><option>Never</option></select>
+                    <select id="setting-resume-position"><option value="always">Always</option><option value="ask">Ask</option><option value="never">Never</option></select>
                   </div>
                   <div class="setting-row">
                     <div class="setting-info">
                       <span class="setting-label">Allow only one running instance</span>
                       <span class="setting-desc">Enqueue files in one player instance when opened from system</span>
                     </div>
-                    <input type="checkbox" class="custom-checkbox" checked />
+                    <input type="checkbox" id="setting-single-instance" class="custom-checkbox" checked />
                   </div>
                 </div>
               </div>
@@ -837,23 +850,23 @@
                   <div class="setting-row">
                     <div class="setting-info">
                       <span class="setting-label">Theme Mode</span>
-                      <span class="setting-desc">Juxtopposed dark graphite with traffic cone orange accents</span>
+                      <span class="setting-desc">Sleek dark graphite with electric cyan & indigo accents</span>
                     </div>
-                    <select><option>Deep Graphite Dark</option><option>OLED True Black</option></select>
+                    <select id="setting-theme-mode"><option value="dark">Deep Graphite Dark</option><option value="black">OLED True Black</option></select>
                   </div>
                   <div class="setting-row">
                     <div class="setting-info">
                       <span class="setting-label">Auto-hide chrome timeout</span>
                       <span class="setting-desc">Delay before concealing header and bottom controls during playback</span>
                     </div>
-                    <select><option>2.5 seconds</option><option>4.0 seconds</option><option>Never hide</option></select>
+                    <select id="setting-autohide-timeout"><option value="2500">2.5 seconds</option><option value="4000">4.0 seconds</option><option value="0">Never hide</option></select>
                   </div>
                   <div class="setting-row">
                     <div class="setting-info">
                       <span class="setting-label">On-Screen Display (OSD) notifications</span>
                       <span class="setting-desc">Display feedback badges when adjusting volume, speed, or seeking</span>
                     </div>
-                    <input type="checkbox" class="custom-checkbox" checked />
+                    <input type="checkbox" id="setting-osd-enabled" class="custom-checkbox" checked />
                   </div>
                 </div>
               </div>
@@ -868,18 +881,19 @@
                     </thead>
                     <tbody>
                       <tr><td>Play / Pause</td><td><span class="keycap">Space</span> / <span class="keycap">K</span></td><td>Global</td></tr>
+                      <tr><td>Stop</td><td><span class="keycap">S</span></td><td>Global</td></tr>
                       <tr><td>Fullscreen Toggle</td><td><span class="keycap">F</span></td><td>Global</td></tr>
+                      <tr><td>Picture-in-Picture</td><td><span class="keycap">I</span></td><td>Video</td></tr>
                       <tr><td>Mute Audio</td><td><span class="keycap">M</span></td><td>Global</td></tr>
                       <tr><td>Jump -10s / +10s</td><td><span class="keycap">←</span> / <span class="keycap">→</span></td><td>Global</td></tr>
                       <tr><td>Volume Up / Down</td><td><span class="keycap">↑</span> / <span class="keycap">↓</span></td><td>Global</td></tr>
                       <tr><td>Subtitle Delay -50ms / +50ms</td><td><span class="keycap">G</span> / <span class="keycap">H</span></td><td>Subtitles</td></tr>
-                      <tr><td>Audio Delay -50ms / +50ms</td><td><span class="keycap">J</span> / <span class="keycap">K</span></td><td>Audio</td></tr>
+                      <tr><td>Audio Delay -50ms / +50ms</td><td><span class="keycap">J</span> / <span class="keycap">Shift+J</span></td><td>Audio</td></tr>
                       <tr><td>Next / Previous Track</td><td><span class="keycap">N</span> / <span class="keycap">P</span></td><td>Playlist</td></tr>
-                      <tr><td>Take Frame Snapshot</td><td><span class="keycap">S</span></td><td>Video</td></tr>
+                      <tr><td>Take Frame Snapshot</td><td><span class="keycap">Shift+S</span></td><td>Video</td></tr>
                       <tr><td>Step Single Frame Forward</td><td><span class="keycap">E</span></td><td>Video</td></tr>
                       <tr><td>Toggle Loop Mode</td><td><span class="keycap">L</span></td><td>Playlist</td></tr>
                       <tr><td>Toggle Shuffle</td><td><span class="keycap">R</span></td><td>Playlist</td></tr>
-                      <tr><td>Picture-in-Picture</td><td><span class="keycap">P</span></td><td>Video</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -892,38 +906,38 @@
                   <div class="setting-row">
                     <div class="setting-info">
                       <span class="setting-label">Allow 200% Volume Boost</span>
-                      <span class="setting-desc">VLC signature overdrive amplifier for quiet media files</span>
+                      <span class="setting-desc">Signature overdrive amplifier up to 200% for quiet media</span>
                     </div>
-                    <input type="checkbox" class="custom-checkbox" checked />
+                    <input type="checkbox" id="setting-boost-200" class="custom-checkbox" checked />
                   </div>
                   <div class="setting-row">
                     <div class="setting-info">
                       <span class="setting-label">Audio Normalization</span>
-                      <span class="setting-desc">Even out sudden dynamic volume spikes in movies</span>
+                      <span class="setting-desc">Even out dynamic volume peaks using compressor filter</span>
                     </div>
-                    <input type="checkbox" class="custom-checkbox" />
+                    <input type="checkbox" id="setting-audio-norm" class="custom-checkbox" />
                   </div>
                 </div>
               </div>
 
               <!-- Other categories fallback message -->
               <div class="settings-category-panel" id="settings-panel-playback" style="display: none;">
-                <div class="setting-group"><div class="setting-group-title">Playback Settings</div><p style="color:var(--text-muted);">Default speed, auto-play next episode, and hardware decoding options are active.</p></div>
+                <div class="setting-group"><div class="setting-group-title">Playback Settings</div><p style="color:var(--text-muted);">Default 1.0x playback speed and automatic queue progression are active.</p></div>
               </div>
               <div class="settings-category-panel" id="settings-panel-video" style="display: none;">
-                <div class="setting-group"><div class="setting-group-title">Video Output</div><p style="color:var(--text-muted);">WebGL / CSS Canvas hardware compositing enabled with 60fps refresh.</p></div>
+                <div class="setting-group"><div class="setting-group-title">Video Output</div><p style="color:var(--text-muted);">Chromium hardware-accelerated video compositing with CSS filter pipeline active.</p></div>
               </div>
               <div class="settings-category-panel" id="settings-panel-subtitles" style="display: none;">
-                <div class="setting-group"><div class="setting-group-title">Subtitle Engine</div><p style="color:var(--text-muted);">Auto-detection fuzzy match score: Normal. Visual timeline sync enabled.</p></div>
+                <div class="setting-group"><div class="setting-group-title">Subtitle Engine</div><p style="color:var(--text-muted);">SRT and WebVTT parser active with millisecond visual timeline synchronization.</p></div>
               </div>
               <div class="settings-category-panel" id="settings-panel-library" style="display: none;">
-                <div class="setting-group"><div class="setting-group-title">Media Library</div><p style="color:var(--text-muted);">In-player slide-out library separates temporary queue from permanent collections.</p></div>
+                <div class="setting-group"><div class="setting-group-title">Media Library</div><p style="color:var(--text-muted);">In-player slide-out drawer separates temporary active queue from permanent collections.</p></div>
               </div>
               <div class="settings-category-panel" id="settings-panel-network" style="display: none;">
-                <div class="setting-group"><div class="setting-group-title">Network Streams</div><p style="color:var(--text-muted);">CORS proxy and HLS adaptive bitrate streaming enabled.</p></div>
+                <div class="setting-group"><div class="setting-group-title">Network Streams</div><p style="color:var(--text-muted);">Direct HTTP/HTTPS stream playback via Chromium media stack. Streams require standard formats (MP4, WebM, OGG).</p></div>
               </div>
               <div class="settings-category-panel" id="settings-panel-performance" style="display: none;">
-                <div class="setting-group"><div class="setting-group-title">Performance & Acceleration</div><p style="color:var(--text-muted);">GPU hardware acceleration enabled for video decoding and canvas visualizers.</p></div>
+                <div class="setting-group"><div class="setting-group-title">Performance & Acceleration</div><p style="color:var(--text-muted);">Hardware acceleration (GPU rasterization, zero-copy video decode) active in Electron.</p></div>
               </div>
             </div>
           </div>
@@ -951,36 +965,36 @@
               <div style="font-size: 12px; color: var(--text-muted);">Choose a curated layout preset or toggle individual widgets</div>
             </div>
             <div style="display: flex; gap: 6px;">
-              <button class="btn-secondary active" id="profile-btn-standard" onclick="window.vlcApp.player.applyToolbarProfile('standard');">Standard</button>
-              <button class="btn-secondary" id="profile-btn-minimal" onclick="window.vlcApp.player.applyToolbarProfile('minimal');">Minimalist</button>
-              <button class="btn-secondary" id="profile-btn-pro" onclick="window.vlcApp.player.applyToolbarProfile('pro');">Pro Editor</button>
+              <button class="btn-secondary active" id="profile-btn-standard" data-toolbar-profile="standard">Standard</button>
+              <button class="btn-secondary" id="profile-btn-minimal" data-toolbar-profile="minimal">Minimalist</button>
+              <button class="btn-secondary" id="profile-btn-pro" data-toolbar-profile="pro">Pro Editor</button>
             </div>
           </div>
 
           <div class="toolbar-builder-canvas">
             <span style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Available Toolbar Widgets (Click to toggle)</span>
             <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-              <div class="toolbar-widget-pill enabled">▶ Play / Pause</div>
-              <div class="toolbar-widget-pill enabled">⏮ Previous / Next ⏭</div>
-              <div class="toolbar-widget-pill enabled">↺ 10s Step Jump ↻</div>
-              <div class="toolbar-widget-pill enabled">⏹ Stop</div>
-              <div class="toolbar-widget-pill enabled">🔁 Loop & Shuffle 🔀</div>
-              <div class="toolbar-widget-pill enabled">A⇄B Repeat Loop</div>
-              <div class="toolbar-widget-pill enabled">⏱ Elapsed / Duration</div>
-              <div class="toolbar-widget-pill enabled">🔊 Cone Volume (200%)</div>
-              <div class="toolbar-widget-pill enabled">⚡ Speed Selector</div>
-              <div class="toolbar-widget-pill enabled">💬 Subtitle Track</div>
-              <div class="toolbar-widget-pill enabled">🎵 Audio Stream</div>
-              <div class="toolbar-widget-pill enabled">🎚 Visual Equalizer</div>
-              <div class="toolbar-widget-pill enabled">📷 Frame Snapshot</div>
-              <div class="toolbar-widget-pill enabled">📺 Picture-in-Picture</div>
-              <div class="toolbar-widget-pill enabled">⛶ Fullscreen</div>
+              <div class="toolbar-widget-pill enabled" data-widget="play-pause">▶ Play / Pause</div>
+              <div class="toolbar-widget-pill enabled" data-widget="prev-next">⏮ Previous / Next ⏭</div>
+              <div class="toolbar-widget-pill enabled" data-widget="step-jump">↺ 10s Step Jump ↻</div>
+              <div class="toolbar-widget-pill enabled" data-widget="stop">⏹ Stop</div>
+              <div class="toolbar-widget-pill enabled" data-widget="loop-shuffle">🔁 Loop & Shuffle 🔀</div>
+              <div class="toolbar-widget-pill enabled" data-widget="ab-repeat">A⇄B Repeat Loop</div>
+              <div class="toolbar-widget-pill enabled" data-widget="time-display">⏱ Elapsed / Duration</div>
+              <div class="toolbar-widget-pill enabled" data-widget="volume">🔊 Volume (200%)</div>
+              <div class="toolbar-widget-pill enabled" data-widget="speed">⚡ Speed Selector</div>
+              <div class="toolbar-widget-pill enabled" data-widget="subtitles">💬 Subtitle Track</div>
+              <div class="toolbar-widget-pill enabled" data-widget="audio">🎵 Audio Stream</div>
+              <div class="toolbar-widget-pill enabled" data-widget="equalizer">🎚 Visual Equalizer</div>
+              <div class="toolbar-widget-pill enabled" data-widget="snapshot">📷 Frame Snapshot</div>
+              <div class="toolbar-widget-pill enabled" data-widget="pip">📺 Picture-in-Picture</div>
+              <div class="toolbar-widget-pill enabled" data-widget="fullscreen">⛶ Fullscreen</div>
             </div>
           </div>
         </div>
 
         <div class="modal-footer">
-          <button class="btn-primary modal-close-btn">Save Layout</button>
+          <button class="btn-primary modal-close-btn" id="btn-save-toolbar-layout">Save Layout</button>
         </div>
       </div>
     </div>
@@ -1028,7 +1042,7 @@
                 <div style="font-size: 11px; color: var(--text-muted);">ElephantsDream.mp4</div>
               </div>
               <div class="batch-sub-status">
-                <button class="btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="this.outerHTML='<span class=\'badge badge-green\'>Matched (98%)</span>'">
+                <button class="btn-secondary btn-auto-fetch-sub" style="padding: 4px 8px; font-size: 11px;">
                   Auto-Fetch Subtitle
                 </button>
               </div>
@@ -1040,7 +1054,7 @@
                 <div style="font-size: 11px; color: var(--text-muted);">TearsOfSteel.mp4</div>
               </div>
               <div class="batch-sub-status">
-                <button class="btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="this.outerHTML='<span class=\'badge badge-green\'>Matched (99%)</span>'">
+                <button class="btn-secondary btn-auto-fetch-sub" style="padding: 4px 8px; font-size: 11px;">
                   Auto-Fetch Subtitle
                 </button>
               </div>
@@ -1050,7 +1064,7 @@
 
         <div class="modal-footer">
           <button class="btn-secondary modal-cancel-btn">Close</button>
-          <button class="btn-primary modal-close-btn" onclick="window.vlcApp.player.showOSD('Batch Subtitles Synced!');">Apply All</button>
+          <button class="btn-primary modal-close-btn" id="btn-batch-sub-apply">Apply All</button>
         </div>
       </div>
     </div>

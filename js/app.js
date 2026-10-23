@@ -1,92 +1,139 @@
-/* VLC Plus - Application Entry Point & Orchestrator */
+/* PAV (Play Any Video) - Application Entry Point & Orchestrator */
 
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize Core Player
-  const player = new VLCPlayer();
-  player.initEngines();
+  let player = null;
+  try {
+    player = new VLCPlayer();
+    player.initEngines();
+  } catch (err) {
+    console.error('Core player initialization failed:', err);
+  }
 
   // Initialize UI Controller
-  const ui = new VLCUI({
-    player: player,
-    audioEngine: player.audioEngine,
-    videoFX: player.videoFX,
-    subtitles: player.subtitles,
-    queue: player.queue
-  });
+  let ui = null;
+  try {
+    ui = new VLCUI({
+      player: player,
+      audioEngine: player ? player.audioEngine : null,
+      videoFX: player ? player.videoFX : null,
+      subtitles: player ? player.subtitles : null,
+      queue: player ? player.queue : null
+    });
+  } catch (err) {
+    console.error('UI controller initialization failed:', err);
+  }
 
-  // Global App Registry
+  // Global App Registry - exposed immediately for any legacy inline handlers or console debugging
   window.vlcApp = {
     player: player,
-    audio: player.audioEngine,
-    videoFX: player.videoFX,
-    subtitles: player.subtitles,
-    queue: player.queue,
+    audio: player ? player.audioEngine : null,
+    videoFX: player ? player.videoFX : null,
+    videoFx: player ? player.videoFX : null,
+    subtitles: player ? player.subtitles : null,
+    queue: player ? player.queue : null,
     ui: ui
   };
 
   // Render Initial Queue & Library UI
-  player.queue.renderQueueUI();
-  player.queue.renderLibraryUI();
-
-  // Load first item from queue
-  if (player.queue.activeQueue.length > 0) {
-    player.loadMedia(player.queue.activeQueue[0]);
+  if (player && player.queue) {
+    try {
+      player.queue.renderQueueUI();
+      player.queue.renderLibraryUI();
+    } catch (err) {
+      console.error('Initial queue/library render error:', err);
+    }
   }
 
-  // Hook Volume Controls UI buttons
-  const volMuteBtn = document.getElementById('volume-cone-icon-btn');
-  if (volMuteBtn) {
-    volMuteBtn.addEventListener('click', () => player.toggleMute());
-  }
+  // Helper for safe element click binding
+  const bindClick = (id, handler) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('click', handler);
+    }
+  };
 
-  // Hook Playback Control Buttons (Left-aligned cluster)
-  document.getElementById('ctrl-play-pause-btn').addEventListener('click', () => player.togglePlay());
-  document.getElementById('ctrl-prev-btn').addEventListener('click', () => player.queue.playPrev());
-  document.getElementById('ctrl-next-btn').addEventListener('click', () => player.queue.playNext());
-  document.getElementById('ctrl-step-back-btn').addEventListener('click', () => player.seekBy(-10));
-  document.getElementById('ctrl-step-fwd-btn').addEventListener('click', () => player.seekBy(10));
-  document.getElementById('ctrl-stop-btn').addEventListener('click', () => player.stop());
-  document.getElementById('ctrl-loop-btn').addEventListener('click', () => {
-    const loop = player.queue.toggleLoop();
-    document.getElementById('ctrl-loop-btn').classList.toggle('active', loop !== 'none');
-    player.showOSD(`Loop: ${loop.toUpperCase()}`);
-  });
-  document.getElementById('ctrl-shuffle-btn').addEventListener('click', () => {
-    const shuf = player.queue.toggleShuffle();
-    document.getElementById('ctrl-shuffle-btn').classList.toggle('active', shuf);
-    player.showOSD(`Shuffle: ${shuf ? 'ON' : 'OFF'}`);
+  // Volume Controls UI button (cone icon mute toggle)
+  bindClick('volume-cone-icon-btn', () => {
+    if (player) player.toggleMute();
   });
 
-  const abLoopBtn = document.getElementById('ctrl-ab-loop-btn');
-  if (abLoopBtn) {
-    abLoopBtn.addEventListener('click', () => player.toggleABLoop());
-  }
+  // Playback Control Buttons (Left-aligned cluster)
+  bindClick('ctrl-play-pause-btn', () => {
+    if (player) player.togglePlay();
+  });
+  bindClick('ctrl-prev-btn', () => {
+    if (player && player.queue) player.queue.playPrev();
+  });
+  bindClick('ctrl-next-btn', () => {
+    if (player && player.queue) player.queue.playNext();
+  });
+  bindClick('ctrl-step-back-btn', () => {
+    if (player) player.seekBy(-10);
+  });
+  bindClick('ctrl-step-fwd-btn', () => {
+    if (player) player.seekBy(10);
+  });
+  bindClick('ctrl-stop-btn', () => {
+    if (player) player.stop();
+  });
+  bindClick('ctrl-loop-btn', () => {
+    if (player && player.queue) {
+      const loop = player.queue.toggleLoop();
+      const btn = document.getElementById('ctrl-loop-btn');
+      if (btn) btn.classList.toggle('active', loop !== 'none');
+      player.showOSD(`Loop: ${loop.toUpperCase()}`);
+    }
+  });
+  bindClick('ctrl-shuffle-btn', () => {
+    if (player && player.queue) {
+      const shuf = player.queue.toggleShuffle();
+      const btn = document.getElementById('ctrl-shuffle-btn');
+      if (btn) btn.classList.toggle('active', shuf);
+      player.showOSD(`Shuffle: ${shuf ? 'ON' : 'OFF'}`);
+    }
+  });
+  bindClick('ctrl-ab-loop-btn', () => {
+    if (player) player.toggleABLoop();
+  });
 
-  // Hook Right-aligned utility buttons
-  document.getElementById('btn-fullscreen').addEventListener('click', () => player.toggleFullscreen());
-  document.getElementById('btn-pip').addEventListener('click', () => player.togglePiP());
-  document.getElementById('btn-equalizer-modal').addEventListener('click', () => ui.openModal('modal-equalizer-fx'));
-  document.getElementById('btn-visual-sync-modal').addEventListener('click', () => ui.openModal('modal-visual-sync'));
-  document.getElementById('btn-snapshot-quick').addEventListener('click', () => {
-    player.videoFX.takeSnapshot();
-    player.showOSD('Snapshot Captured!', 'camera');
+  // Right-aligned utility buttons
+  bindClick('btn-fullscreen', () => {
+    if (player) player.toggleFullscreen();
+  });
+  bindClick('btn-pip', () => {
+    if (player) player.togglePiP();
+  });
+  bindClick('btn-equalizer-modal', () => {
+    if (ui) ui.openModal('modal-equalizer-fx');
+  });
+  bindClick('btn-visual-sync-modal', () => {
+    if (ui) ui.openModal('modal-visual-sync');
+  });
+  bindClick('btn-snapshot-quick', () => {
+    if (player && player.videoFX) {
+      player.videoFX.takeSnapshot();
+      player.showOSD('Snapshot Captured!', 'camera');
+    }
   });
 
   // Subtitle quick popover actions
   const subToggleBtn = document.getElementById('popover-sub-toggle');
   if (subToggleBtn) {
     subToggleBtn.addEventListener('click', () => {
-      if (player.subtitles.cues.length > 0) {
-        player.subtitles.cues = [];
-        player.subtitles.currentTrackName = 'Off';
-        subToggleBtn.textContent = 'Enable Subtitles (Sample)';
-        player.showOSD('Subtitles: OFF');
-      } else {
-        player.subtitles.loadSampleSubtitles();
-        subToggleBtn.textContent = 'Disable Subtitles';
-        player.showOSD('Subtitles: ON');
+      if (player && player.subtitles) {
+        if (player.subtitles.cues.length > 0) {
+          player.subtitles.cues = [];
+          player.subtitles.currentTrackName = 'Off';
+          subToggleBtn.textContent = 'Enable Subtitles (Sample)';
+          player.showOSD('Subtitles: OFF');
+        } else {
+          player.subtitles.loadSampleSubtitles();
+          subToggleBtn.textContent = 'Disable Subtitles';
+          player.showOSD('Subtitles: ON');
+        }
       }
-      ui.closeAllPopovers();
+      if (ui) ui.closeAllPopovers();
     });
   }
 
@@ -94,33 +141,45 @@ document.addEventListener('DOMContentLoaded', () => {
   const subFileInput = document.getElementById('sub-file-input');
   if (subFileInput) {
     subFileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
+      const file = e.target.files && e.target.files[0];
+      if (file && player && player.subtitles) {
         const reader = new FileReader();
         reader.onload = (ev) => {
           player.subtitles.loadSubtitlesFromText(ev.target.result, file.name);
           player.showOSD(`Loaded: ${file.name}`);
-          ui.closeAllPopovers();
+          if (ui) ui.closeAllPopovers();
         };
         reader.readAsText(file);
       }
     });
+  }
+
   // --- Desktop Application Integration (Electron) ---
   if (window.electronAPI) {
-    document.getElementById('win-btn-minimize').addEventListener('click', () => {
+    bindClick('win-btn-minimize', () => {
       window.electronAPI.minimize();
     });
 
-    document.getElementById('win-btn-maximize').addEventListener('click', () => {
+    bindClick('win-btn-maximize', () => {
       window.electronAPI.maximize();
     });
 
-    document.getElementById('win-btn-close').addEventListener('click', () => {
+    bindClick('win-btn-close', () => {
       window.electronAPI.close();
     });
 
+    if (typeof window.electronAPI.onWindowStateChange === 'function') {
+      window.electronAPI.onWindowStateChange((isMaximized) => {
+        const maxBtn = document.getElementById('win-btn-maximize');
+        if (maxBtn) {
+          maxBtn.title = isMaximized ? 'Restore' : 'Maximize';
+        }
+      });
+    }
+
     // Native file open on startup or second instance (e.g. Open with PAV)
-    window.electronAPI.onOpenFile((filePath) => {
+    const handleOpenedFile = (filePath) => {
+      if (!filePath || !player) return;
       const fileName = filePath.split(/[\\/]/).pop();
       const ext = fileName.split('.').pop().toLowerCase();
       const isAudio = ['mp3', 'flac', 'wav', 'ogg', 'm4a', 'aac'].includes(ext);
@@ -136,9 +195,25 @@ document.addEventListener('DOMContentLoaded', () => {
         poster: isAudio ? 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80' : '',
         hasSubtitles: false
       };
-      player.queue.addToQueue(newItem, true);
+      if (player.queue) {
+        player.queue.addToQueue(newItem, true);
+      }
       player.showOSD(`Playing: ${fileName}`);
-    });
+    };
+
+    if (typeof window.electronAPI.onOpenFile === 'function') {
+      window.electronAPI.onOpenFile(handleOpenedFile);
+    }
+
+    if (typeof window.electronAPI.getInitialFile === 'function') {
+      window.electronAPI.getInitialFile().then((initialFile) => {
+        if (initialFile) {
+          handleOpenedFile(initialFile);
+        }
+      }).catch((err) => {
+        console.warn('getInitialFile error:', err);
+      });
+    }
   }
 
   console.log('PAV (Play Any Video) initialized successfully.');

@@ -29,14 +29,18 @@ class VLCAudioEngine {
   }
 
   init() {
-    if (this.initialized) return;
+    if (this.initialized || !this.mediaElement) return;
 
     try {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return;
       this.audioCtx = new AudioContext();
 
-      // Create nodes
-      this.sourceNode = this.audioCtx.createMediaElementSource(this.mediaElement);
+      // Ensure createMediaElementSource is only ever called once per media element
+      if (!this.mediaElement._audioSourceNode) {
+        this.mediaElement._audioSourceNode = this.audioCtx.createMediaElementSource(this.mediaElement);
+      }
+      this.sourceNode = this.mediaElement._audioSourceNode;
       this.preampNode = this.audioCtx.createGain();
       this.volumeNode = this.audioCtx.createGain();
       this.analyserNode = this.audioCtx.createAnalyser();
@@ -75,16 +79,22 @@ class VLCAudioEngine {
       this.initialized = true;
       this.setVolume(this.volumeRatio);
     } catch (e) {
-      console.warn('AudioContext initialization deferred until user interaction or cross-origin policy:', e);
+      console.warn('AudioContext initialization deferred or bypassed for direct audio:', e);
     }
   }
 
   ensureContext() {
-    if (!this.initialized) {
-      this.init();
-    }
-    if (this.audioCtx && this.audioCtx.state === 'suspended') {
-      this.audioCtx.resume();
+    try {
+      if (!this.initialized) {
+        this.init();
+      }
+      if (this.audioCtx && this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume().catch(e => {
+          console.warn('AudioContext resume deferred until interaction:', e);
+        });
+      }
+    } catch (e) {
+      console.warn('ensureContext error:', e);
     }
   }
 

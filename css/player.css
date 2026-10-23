@@ -20,18 +20,18 @@
   -webkit-app-region: drag; /* Allows dragging desktop window by header */
 }
 
-/* Make all interactive buttons and menus non-draggable so clicks work */
+/* Make all interactive buttons, menus, dropdowns, inputs non-draggable so clicks work */
 .player-header button,
+.player-header button *,
 .player-header nav,
+.player-header nav *,
 .player-header input,
-.player-header .menu-dropdown {
-  -webkit-app-region: no-drag;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+.player-header .menu-dropdown,
+.player-header .menu-dropdown *,
+.player-header .header-left,
+.player-header .header-left *,
+.player-header .header-right,
+.player-header .header-right * {
   -webkit-app-region: no-drag;
 }
 
@@ -384,16 +384,75 @@ video#main-video {
 .music-mode-view {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 40%, rgba(255, 106, 0, 0.12) 0%, rgba(11, 13, 18, 0.98) 75%);
+  background: radial-gradient(circle at 50% 40%, rgba(0, 240, 255, 0.12) 0%, rgba(11, 13, 18, 0.98) 75%);
   display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 20;
+  pointer-events: none;
 }
 
 .music-mode-view.active {
   display: flex;
+  pointer-events: auto;
+}
+
+/* Empty State / Welcome Dropzone in Viewport */
+.player-empty-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 15;
+  background: radial-gradient(circle at 50% 45%, rgba(0, 240, 255, 0.08) 0%, rgba(11, 13, 18, 0.95) 70%);
+  transition: opacity var(--transition-normal);
+}
+
+.player-empty-state.hidden {
+  display: none;
+}
+
+.empty-state-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 48px;
+  border-radius: var(--radius-xl);
+  background: rgba(18, 22, 33, 0.7);
+  border: 1px dashed rgba(0, 240, 255, 0.35);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.empty-state-btn:hover {
+  background: rgba(22, 28, 42, 0.9);
+  border-color: var(--pav-cyan);
+  box-shadow: 0 0 28px var(--pav-cyan-glow);
+  transform: translateY(-2px);
+}
+
+.empty-state-icon {
+  width: 56px;
+  height: 56px;
+  color: var(--pav-cyan);
+  filter: drop-shadow(0 2px 8px var(--pav-cyan-glow));
+}
+
+.empty-state-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.empty-state-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
 }
 
 .music-cover-wrapper {

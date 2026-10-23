@@ -1,24 +1,27 @@
-/* VLC Plus - Modern Design Tokens & Theme Variables
- * Inspired by Juxtopposed's "I Redesigned VLC After 25 Years"
- * Signature Traffic Cone Orange (#FF6B00 / #FF7700), Utilitarian Softened Rectangles,
- * Deep Graphite Dark Mode, Glassmorphic Panels, and Crisp Monochrome Player Controls.
+/* PAV (Play Any Video) - Modern Design Tokens & Theme Variables
+ * Signature Electric Cyan (#00F0FF) to Indigo/Violet (#7000FF) Accent Palette,
+ * Deep Slate / Graphite Dark Mode, Utilitarian Softened Rectangles,
+ * Glassmorphic Panels, and Modern High-Fidelity Player Controls.
  */
 
 :root {
-  /* Brand & Signature Accent Colors */
-  --vlc-orange: #FF6A00;
-  --vlc-orange-glow: rgba(255, 106, 0, 0.45);
-  --vlc-orange-hover: #FF8024;
-  --vlc-orange-dark: #D45500;
-  --vlc-amber: #FFB300;
-  --vlc-cone-white: #FFFFFF;
-  --vlc-cone-stripe: #E5E7EB;
-
-  /* PAV (Play Any Video) Electric Cyan & Violet Identity */
+  /* PAV Electric Cyan & Indigo Signature Brand Palette */
   --pav-cyan: #00F0FF;
-  --pav-violet: #7000FF;
   --pav-cyan-glow: rgba(0, 240, 255, 0.45);
+  --pav-cyan-hover: #38F8FF;
+  --pav-indigo: #7000FF;
+  --pav-indigo-glow: rgba(112, 0, 255, 0.45);
   --pav-gradient: linear-gradient(135deg, #00F0FF 0%, #7000FF 100%);
+  --pav-gradient-h: linear-gradient(90deg, #00F0FF 0%, #7000FF 100%);
+
+  /* Accent aliases for components */
+  --vlc-orange: var(--pav-cyan);
+  --vlc-orange-glow: var(--pav-cyan-glow);
+  --vlc-orange-hover: var(--pav-cyan-hover);
+  --vlc-orange-dark: #00B4D8;
+  --vlc-amber: var(--pav-indigo);
+  --vlc-cone-white: #FFFFFF;
+  --vlc-cone-stripe: #00F0FF;
 
   /* Surface & Background Colors */
   --bg-main: #0B0D12;

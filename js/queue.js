@@ -213,7 +213,7 @@ class VLCQueueManager {
     container.innerHTML = this.activeQueue.map((item, idx) => {
       const isPlaying = idx === this.currentIndex;
       return `
-        <div class="queue-item-card ${isPlaying ? 'playing' : ''}" onclick="window.vlcApp.queue.playIndex(${idx})">
+        <div class="queue-item-card ${isPlaying ? 'playing' : ''}" data-queue-action="play" data-index="${idx}">
           <div class="queue-item-drag-handle" title="Drag to reorder">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="9" cy="12" r="1"></circle><circle cx="9" cy="5" r="1"></circle><circle cx="9" cy="19" r="1"></circle>
@@ -221,7 +221,7 @@ class VLCQueueManager {
             </svg>
           </div>
           <div class="queue-item-thumb">
-            <img src="${item.poster}" alt="${item.title}" />
+            <img src="${item.poster || 'logo.svg'}" alt="${item.title}" />
           </div>
           <div class="queue-item-info">
             <span class="queue-item-title">${item.title}</span>
@@ -232,7 +232,7 @@ class VLCQueueManager {
             </div>
           </div>
           <div class="queue-item-actions">
-            <button class="queue-action-btn" title="Remove" onclick="window.vlcApp.queue.removeFromQueue(${idx}, event)">
+            <button class="queue-action-btn" title="Remove" data-queue-action="remove" data-index="${idx}">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -242,6 +242,24 @@ class VLCQueueManager {
         </div>
       `;
     }).join('');
+
+    if (!container._hasListener) {
+      container._hasListener = true;
+      container.addEventListener('click', (e) => {
+        const removeBtn = e.target.closest('[data-queue-action="remove"]');
+        if (removeBtn) {
+          e.stopPropagation();
+          const idx = parseInt(removeBtn.dataset.index, 10);
+          this.removeFromQueue(idx, e);
+          return;
+        }
+        const card = e.target.closest('[data-queue-action="play"]');
+        if (card) {
+          const idx = parseInt(card.dataset.index, 10);
+          this.playIndex(idx);
+        }
+      });
+    }
   }
 
   renderLibraryUI() {
@@ -250,9 +268,9 @@ class VLCQueueManager {
 
     container.innerHTML = this.savedLibrary.map((item, idx) => {
       return `
-        <div class="library-card" onclick="window.vlcApp.queue.addToQueue(window.vlcApp.queue.savedLibrary[${idx}], true)">
+        <div class="library-card" data-library-action="add" data-index="${idx}">
           <div class="library-card-thumb ${item.type === 'audio' ? 'music-thumb' : ''}">
-            <img src="${item.poster}" alt="${item.title}" />
+            <img src="${item.poster || 'logo.svg'}" alt="${item.title}" />
             <span class="badge ${item.type === 'video' ? 'badge-orange' : 'badge-green'}" style="position: absolute; bottom: 4px; right: 4px;">
               ${item.type.toUpperCase()}
             </span>
@@ -262,6 +280,19 @@ class VLCQueueManager {
         </div>
       `;
     }).join('');
+
+    if (!container._hasListener) {
+      container._hasListener = true;
+      container.addEventListener('click', (e) => {
+        const card = e.target.closest('[data-library-action="add"]');
+        if (card) {
+          const idx = parseInt(card.dataset.index, 10);
+          if (this.savedLibrary[idx]) {
+            this.addToQueue({ ...this.savedLibrary[idx] }, true);
+          }
+        }
+      });
+    }
   }
 }
 

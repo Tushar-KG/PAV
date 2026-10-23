@@ -111,8 +111,9 @@ class VLCPlayer {
 
   applyToolbarProfile(profileName) {
     this.currentToolbarProfile = profileName;
-    const leftCluster = document.querySelector('.controls-left-cluster');
-    const rightCluster = document.querySelector('.controls-right-cluster');
+    try {
+      localStorage.setItem('pav_toolbar_profile', profileName);
+    } catch (e) {}
 
     const stepBackBtn = document.getElementById('ctrl-step-back-btn');
     const stepFwdBtn = document.getElementById('ctrl-step-fwd-btn');
@@ -121,29 +122,65 @@ class VLCPlayer {
     const stopBtn = document.getElementById('ctrl-stop-btn');
     const loopBtn = document.getElementById('ctrl-loop-btn');
     const shuffleBtn = document.getElementById('ctrl-shuffle-btn');
-    const speedBtn = document.getElementById('btn-speed-selector');
-    const subBtn = document.querySelector('[data-popover-target="popover-subtitles"]');
-    const audioBtn = document.querySelector('[data-popover-target="popover-audio"]');
+    const abLoopBtn = document.getElementById('ctrl-ab-loop-btn');
     const syncBtn = document.getElementById('btn-visual-sync-modal');
     const pipBtn = document.getElementById('btn-pip');
+    const speedBtn = document.getElementById('btn-speed-selector');
+    const eqBtn = document.getElementById('btn-equalizer-modal');
+
+    // Update active button state in customizer modal
+    ['standard', 'minimal', 'pro'].forEach(p => {
+      const btn = document.getElementById(`profile-btn-${p}`);
+      if (btn) btn.classList.toggle('active', p === profileName);
+    });
 
     if (profileName === 'minimal') {
-      [stepBackBtn, stepFwdBtn, prevBtn, nextBtn, stopBtn, loopBtn, shuffleBtn, syncBtn].forEach(el => {
+      [stepBackBtn, stepFwdBtn, prevBtn, nextBtn, stopBtn, loopBtn, shuffleBtn, abLoopBtn, syncBtn].forEach(el => {
         if (el) el.style.display = 'none';
       });
-    } else {
-      [stepBackBtn, stepFwdBtn, prevBtn, nextBtn, stopBtn, loopBtn, shuffleBtn, syncBtn].forEach(el => {
+      if (speedBtn) speedBtn.style.display = 'inline-flex';
+      if (pipBtn) pipBtn.style.display = 'inline-flex';
+    } else if (profileName === 'pro') {
+      [stepBackBtn, stepFwdBtn, prevBtn, nextBtn, stopBtn, loopBtn, shuffleBtn, abLoopBtn, syncBtn, pipBtn, speedBtn, eqBtn].forEach(el => {
         if (el) el.style.display = 'inline-flex';
       });
+    } else {
+      // Standard
+      [stepBackBtn, stepFwdBtn, prevBtn, nextBtn, stopBtn, loopBtn, shuffleBtn, syncBtn, pipBtn, speedBtn, eqBtn].forEach(el => {
+        if (el) el.style.display = 'inline-flex';
+      });
+      if (abLoopBtn) abLoopBtn.style.display = 'inline-flex';
     }
     this.showOSD(`Toolbar: ${profileName.toUpperCase()}`);
   }
 
   initEngines() {
-    this.audioEngine = new VLCAudioEngine(this.video);
-    this.videoFX = new VLCVideoFX(this.video);
-    this.subtitles = new VLCSubtitleEngine(this);
-    this.queue = new VLCQueueManager(this);
+    try {
+      this.audioEngine = new VLCAudioEngine(this.video);
+    } catch (e) {
+      console.error('Audio engine init failed:', e);
+      this.audioEngine = null;
+    }
+    try {
+      this.videoFX = new VLCVideoFX(this.video);
+      this.videoFx = this.videoFX;
+    } catch (e) {
+      console.error('VideoFX init failed:', e);
+      this.videoFX = null;
+      this.videoFx = null;
+    }
+    try {
+      this.subtitles = new VLCSubtitleEngine(this);
+    } catch (e) {
+      console.error('Subtitle engine init failed:', e);
+      this.subtitles = null;
+    }
+    try {
+      this.queue = new VLCQueueManager(this);
+    } catch (e) {
+      console.error('Queue manager init failed:', e);
+      this.queue = null;
+    }
   }
 
   bindEvents() {
@@ -155,11 +192,42 @@ class VLCPlayer {
     this.video.addEventListener('ended', () => this.onEnded());
     this.video.addEventListener('progress', () => this.updateBufferBar());
 
-    // Auto-hide chrome on inactivity
-    this.viewport.addEventListener('mousemove', () => this.resetChromeTimer());
-    this.viewport.addEventListener('mouseleave', () => this.hideChromeImmediate());
+    // Explicit video decode/format error handler
+    this.video.addEventListener('error', () => {
+      const err = this.video.error;
+      let msg = 'Playback Error: Media format unsupported or file unreadable';
+      if (err) {
+        if (err.code === 1) msg = 'Playback Aborted';
+        else if (err.code === 2) msg = 'Network Error loading media';
+        else if (err.code === 3) msg = 'Decoding Error: Corrupt or unsupported stream';
+        else if (err.code === 4) msg = 'Format Unsupported: Codec not playable by HTML5 video';
+      }
+      this.showOSD(msg, 'error');
+      console.error('HTML5 Video Error:', err);
+    });
+
+    // Auto-hide chrome on inactivity: wake up on any mouse movement across window
+    this.isHoveringChrome = false;
+    const headerEl = document.getElementById('player-header');
+    const controlsEl = document.querySelector('.player-controls-container');
+    const sidebarEl = document.getElementById('library-sidebar');
+    [headerEl, controlsEl, sidebarEl].forEach(el => {
+      if (el) {
+        el.addEventListener('mouseenter', () => {
+          this.isHoveringChrome = true;
+          this.resetChromeTimer();
+        });
+        el.addEventListener('mouseleave', () => {
+          this.isHoveringChrome = false;
+        });
+      }
+    });
+
+    window.addEventListener('mousemove', () => this.resetChromeTimer());
+    document.addEventListener('mouseleave', () => this.hideChromeImmediate());
+
     this.viewport.addEventListener('click', (e) => {
-      // Toggle play/pause on single click if not clicking controls
+      // Toggle play/pause on single click if not clicking controls or empty state
       if (e.target === this.video || e.target === this.viewport) {
         this.togglePlay();
       }
@@ -210,6 +278,24 @@ class VLCPlayer {
   loadMedia(item) {
     if (!item || !item.src) return;
 
+    // Revoke old blob URLs to prevent memory leaks
+    if (this.currentBlobUrl && this.currentBlobUrl !== item.src) {
+      try {
+        URL.revokeObjectURL(this.currentBlobUrl);
+      } catch (e) {}
+      this.currentBlobUrl = null;
+    }
+    if (item.src && item.src.startsWith('blob:')) {
+      this.currentBlobUrl = item.src;
+    }
+
+    // Set crossorigin only when necessary for remote network streams
+    if (item.src.startsWith('http://') || item.src.startsWith('https://')) {
+      this.video.crossOrigin = 'anonymous';
+    } else {
+      this.video.removeAttribute('crossorigin');
+    }
+
     // Reset subtitles
     if (this.subtitles) {
       this.subtitles.setMediaId(item.id);
@@ -221,19 +307,30 @@ class VLCPlayer {
     }
 
     // Update Header metadata
-    document.getElementById('current-media-title').textContent = item.title;
-    document.getElementById('current-media-codec').textContent = item.codec || 'H.264 / AAC';
+    const titleEl = document.getElementById('current-media-title');
+    if (titleEl) titleEl.textContent = item.title;
+    const codecEl = document.getElementById('current-media-codec');
+    if (codecEl) {
+      codecEl.textContent = item.codec || 'Media Loaded';
+      codecEl.style.display = 'inline-flex';
+    }
+
+    // Hide empty state button once media is loaded
+    const emptyState = document.getElementById('player-empty-state');
+    if (emptyState) emptyState.classList.add('hidden');
 
     // Check if music mode
     const musicModeView = document.getElementById('music-mode-view');
     if (item.type === 'audio') {
-      musicModeView.classList.add('active');
-      document.getElementById('music-track-title').textContent = item.title;
-      document.getElementById('music-artist-album').textContent = `${item.artist || 'Unknown Artist'} • ${item.codec || 'Audio Track'}`;
-      document.getElementById('music-cover-img').src = item.poster;
+      if (musicModeView) {
+        musicModeView.classList.add('active');
+        document.getElementById('music-track-title').textContent = item.title;
+        document.getElementById('music-artist-album').textContent = `${item.artist || 'Audio Track'} • ${item.codec || 'Stereo'}`;
+        document.getElementById('music-cover-img').src = item.poster || 'logo.svg';
+      }
       this.startMusicVisualizer();
     } else {
-      musicModeView.classList.remove('active');
+      if (musicModeView) musicModeView.classList.remove('active');
     }
 
     this.video.src = item.src;
@@ -243,7 +340,11 @@ class VLCPlayer {
   }
 
   play() {
-    if (this.audioEngine) this.audioEngine.ensureContext();
+    try {
+      if (this.audioEngine) this.audioEngine.ensureContext();
+    } catch (e) {
+      console.warn('AudioEngine context resume warning:', e);
+    }
     this.video.play().catch(e => console.log('Autoplay deferred:', e));
   }
 
@@ -359,6 +460,24 @@ class VLCPlayer {
   onMetadataLoaded() {
     this.onTimeUpdate();
     this.updateBufferBar();
+
+    const w = this.video.videoWidth;
+    const h = this.video.videoHeight;
+    const codecEl = document.getElementById('current-media-codec');
+    if (codecEl) {
+      if (w && h) {
+        let res = `${w}x${h}`;
+        if (w >= 3840 || h >= 2160) res = '4K UHD';
+        else if (w >= 2560 || h >= 1440) res = '2K QHD';
+        else if (w >= 1920 || h >= 1080) res = '1080p FHD';
+        else if (w >= 1280 || h >= 720) res = '720p HD';
+        codecEl.textContent = `${res} • HTML5 • Stereo`;
+        codecEl.style.display = 'inline-flex';
+      } else {
+        codecEl.textContent = 'Audio Stream';
+        codecEl.style.display = 'inline-flex';
+      }
+    }
   }
 
   onTimeUpdate() {
@@ -489,7 +608,7 @@ class VLCPlayer {
   }
 
   hideChromeImmediate() {
-    if (this.isPlaying && !this.isScrubbing) {
+    if (this.isPlaying && !this.isScrubbing && !this.isHoveringChrome && !document.querySelector('.modal-backdrop.active')) {
       this.container.classList.add('chrome-hidden');
       this.viewport.classList.add('cursor-hidden');
     }
@@ -502,12 +621,13 @@ class VLCPlayer {
     const osdMeter = document.getElementById('osd-meter-bar');
     const osdMeterFill = document.getElementById('osd-meter-fill');
 
+    if (!osd || !osdText) return;
     osdText.textContent = text;
 
-    if (meterPct !== null) {
+    if (meterPct !== null && osdMeter && osdMeterFill) {
       osdMeter.style.display = 'block';
       osdMeterFill.style.width = `${Math.min(100, meterPct / 2)}%`; // 200% mapped to 100% meter
-    } else {
+    } else if (osdMeter) {
       osdMeter.style.display = 'none';
     }
 
@@ -540,6 +660,7 @@ class VLCPlayer {
     switch (e.key) {
       case ' ':
       case 'k':
+      case 'K':
         e.preventDefault();
         this.togglePlay();
         break;
@@ -547,6 +668,11 @@ class VLCPlayer {
       case 'F':
         e.preventDefault();
         this.toggleFullscreen();
+        break;
+      case 'i':
+      case 'I':
+        e.preventDefault();
+        this.togglePiP();
         break;
       case 'm':
       case 'M':
@@ -572,22 +698,20 @@ class VLCPlayer {
       case 'n':
       case 'N':
         e.preventDefault();
-        this.queue.playNext();
+        if (this.queue) this.queue.playNext();
         break;
       case 'p':
       case 'P':
         e.preventDefault();
-        this.queue.playPrev();
+        if (this.queue) this.queue.playPrev();
         break;
       case 'j':
       case 'J':
-        // Audio delay adjust
         e.preventDefault();
-        this.showOSD('Audio Delay: -50ms');
+        this.showOSD(`Audio Delay: ${e.shiftKey ? '+50ms' : '-50ms'}`);
         break;
       case 'g':
       case 'G':
-        // Subtitle delay -50ms
         e.preventDefault();
         if (this.subtitles) {
           const offset = this.subtitles.nudgeSyncOffset(-50);
@@ -596,7 +720,6 @@ class VLCPlayer {
         break;
       case 'h':
       case 'H':
-        // Subtitle delay +50ms
         e.preventDefault();
         if (this.subtitles) {
           const offset = this.subtitles.nudgeSyncOffset(50);
@@ -605,16 +728,38 @@ class VLCPlayer {
         break;
       case 's':
       case 'S':
-        // Snapshot
         e.preventDefault();
-        if (this.videoFX) {
-          this.videoFX.takeSnapshot();
-          this.showOSD('Snapshot Captured!', 'camera');
+        if (e.shiftKey) {
+          if (this.videoFX) {
+            this.videoFX.takeSnapshot();
+            this.showOSD('Snapshot Captured!', 'camera');
+          }
+        } else {
+          this.stop();
+        }
+        break;
+      case 'l':
+      case 'L':
+        e.preventDefault();
+        if (this.queue) {
+          const loop = this.queue.toggleLoop();
+          this.showOSD(`Loop: ${loop.toUpperCase()}`);
+          const loopBtn = document.getElementById('ctrl-loop-btn');
+          if (loopBtn) loopBtn.classList.toggle('active', loop !== 'none');
+        }
+        break;
+      case 'r':
+      case 'R':
+        e.preventDefault();
+        if (this.queue) {
+          const shuf = this.queue.toggleShuffle();
+          this.showOSD(`Shuffle: ${shuf ? 'ON' : 'OFF'}`);
+          const shufBtn = document.getElementById('ctrl-shuffle-btn');
+          if (shufBtn) shufBtn.classList.toggle('active', shuf);
         }
         break;
       case 'e':
       case 'E':
-        // Frame step
         e.preventDefault();
         if (this.videoFX) {
           this.videoFX.stepFrame(true);
@@ -622,33 +767,55 @@ class VLCPlayer {
         }
         break;
       case 'Escape':
-        window.vlcApp.ui.closeAllModals();
+        if (window.vlcApp && window.vlcApp.ui) {
+          window.vlcApp.ui.closeAllModals();
+          window.vlcApp.ui.closeAllPopovers();
+        }
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(err => console.log(err));
+        }
         break;
     }
   }
 
   initDragAndDrop() {
     const overlay = document.getElementById('drag-drop-overlay');
+    if (!overlay) return;
 
-    window.addEventListener('dragover', (e) => {
+    let dragCounter = 0;
+
+    window.addEventListener('dragenter', (e) => {
       e.preventDefault();
+      dragCounter++;
       overlay.classList.add('active');
     });
 
+    window.addEventListener('dragover', (e) => {
+      e.preventDefault();
+    });
+
     window.addEventListener('dragleave', (e) => {
-      if (e.relatedTarget === null) {
+      dragCounter--;
+      if (dragCounter <= 0) {
+        dragCounter = 0;
         overlay.classList.remove('active');
       }
     });
 
     window.addEventListener('drop', (e) => {
       e.preventDefault();
+      dragCounter = 0;
       overlay.classList.remove('active');
 
       const files = e.dataTransfer.files;
-      if (files.length > 0) {
+      if (files && files.length > 0) {
         this.handleDroppedFiles(files);
       }
+    });
+
+    window.addEventListener('dragend', () => {
+      dragCounter = 0;
+      overlay.classList.remove('active');
     });
   }
 

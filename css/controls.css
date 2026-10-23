@@ -415,10 +415,12 @@
   gap: 6px;
   z-index: 90;
   backdrop-filter: blur(20px);
+  pointer-events: none;
 }
 
 .quick-popover.show {
   display: flex;
+  pointer-events: auto;
   animation: popoverFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 

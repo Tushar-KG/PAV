@@ -96,25 +96,30 @@ class VLCVideoFX {
   takeSnapshot() {
     if (!this.video || !this.video.videoWidth) return null;
 
-    const canvas = document.createElement('canvas');
-    canvas.width = this.video.videoWidth;
-    canvas.height = this.video.videoHeight;
-    const ctx = canvas.getContext('2d');
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = this.video.videoWidth;
+      canvas.height = this.video.videoHeight;
+      const ctx = canvas.getContext('2d');
 
-    // Apply current video filter string to canvas context
-    ctx.filter = this.video.style.filter || 'none';
-    ctx.drawImage(this.video, 0, 0, canvas.width, canvas.height);
+      // Apply current video filter string to canvas context
+      ctx.filter = this.video.style.filter || 'none';
+      ctx.drawImage(this.video, 0, 0, canvas.width, canvas.height);
 
-    const dataUrl = canvas.toDataURL('image/png');
-    const filename = `vlc_snapshot_${Math.floor(this.video.currentTime)}s.png`;
+      const dataUrl = canvas.toDataURL('image/png');
+      const filename = `pav_snapshot_${Math.floor(this.video.currentTime)}s.png`;
 
-    // Trigger download
-    const link = document.createElement('a');
-    link.download = filename;
-    link.href = dataUrl;
-    link.click();
+      // Trigger download
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = dataUrl;
+      link.click();
 
-    return { filename, dataUrl };
+      return { filename, dataUrl };
+    } catch (err) {
+      console.warn('Snapshot error (e.g. cross-origin canvas security):', err);
+      return null;
+    }
   }
 
   setABLoopPointA() {

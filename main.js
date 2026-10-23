@@ -35,6 +35,14 @@ function createWindow() {
 
   mainWindow.loadFile('index.html');
 
+  mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
+    console.log(`[RENDERER L${level}] ${message} (${sourceId}:${line})`);
+  });
+
+  if (!app.isPackaged) {
+    mainWindow.webContents.openDevTools({ mode: 'detach' });
+  }
+
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
 
@@ -119,6 +127,21 @@ ipcMain.handle('window-close', () => {
 
 ipcMain.handle('window-is-maximized', () => {
   return mainWindow ? mainWindow.isMaximized() : false;
+});
+
+// Initial file passed via command line argument
+ipcMain.handle('get-initial-file', () => {
+  return getFileFromArgs(process.argv);
+});
+
+// Read text / subtitle file from disk securely
+ipcMain.handle('read-file-text', async (event, filePath) => {
+  try {
+    return await fs.promises.readFile(filePath, 'utf-8');
+  } catch (err) {
+    console.error('Failed to read file:', err);
+    return null;
+  }
 });
 
 // Native OS Open File Dialog
