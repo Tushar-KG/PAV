@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VLC Plus - The Modern Media Player</title>
+  <meta name="description" content="A complete conceptual overhaul of VLC Media Player featuring Juxtopposed UX principles, traffic cone visual identity, thick scrubbing seekbar, left-aligned controls, and visual subtitle sync timeline.">
+  
+  <!-- Modern Google Fonts -->
+  <link rel="icon" type="image/jpeg" href="favicon.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/player.css">
+  <link rel="stylesheet" href="css/controls.css">
+  <link rel="stylesheet" href="css/modals.css">
+  <link rel="stylesheet" href="css/library.css">
+</head>
+<body>
+  <div id="app-container" class="player-container">
+
+    <!-- Top Window & Navigation Header (Auto-hides on inactivity) -->
+    <header class="player-header" id="player-header">
+      <div class="header-left">
+        <!-- Modern Traffic Cone Brand Logo -->
+        <button class="brand-logo-btn" data-tooltip="VLC Plus Modern Media Player">
+          <svg class="vlc-cone-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="32" cy="56" rx="28" ry="6" fill="#D45500" />
+            <path d="M12 55L24 16H40L52 55H12Z" fill="#FF6A00" />
+            <path d="M17 48L20 40H44L47 48H17Z" fill="#FFFFFF" />
+            <path d="M22 34L25 24H39L42 34H22Z" fill="#FFFFFF" />
+            <ellipse cx="32" cy="16" rx="8" ry="3" fill="#FF8024" />
+            <path d="M24 16L32 6L40 16H24Z" fill="#FF8024" />
+          </svg>
+          <span class="brand-title">VLC<span>+</span></span>
+        </button>
+
+        <!-- Classic VLC Menu Bar Redesigned -->
+        <nav class="vlc-menu-bar">
+          <div class="menu-item">
+            <button class="menu-trigger">Media</button>
+            <div class="menu-dropdown">
+              <div class="dropdown-item" data-action="open-file">
+                <span>Open File...</span><span class="keycap">Ctrl+O</span>
+              </div>
+              <div class="dropdown-item" data-action="open-media">
+                <span>Open Network Stream...</span><span class="keycap">Ctrl+N</span>
+              </div>
+              <div class="dropdown-item" data-action="open-media">
+                <span>Capture Device...</span><span class="keycap">Ctrl+C</span>
+              </div>
+              <div class="dropdown-separator"></div>
+              <div class="dropdown-item" data-action="snapshot">
+                <span>Take Snapshot</span><span class="keycap">S</span>
+              </div>
+              <div class="dropdown-separator"></div>
+              <div class="dropdown-item" data-action="about">
+                <span>About VLC Plus</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="menu-item">
+            <button class="menu-trigger">Playback</button>
+            <div class="menu-dropdown">
+              <div class="dropdown-item" onclick="window.vlcApp.player.togglePlay()">
+                <span>Play / Pause</span><span class="keycap">Space</span>
+              </div>
+              <div class="dropdown-item" onclick="window.vlcApp.player.stop()">
+                <span>Stop</span><span class="keycap">S</span>
+              </div>
+              <div class="dropdown-item" onclick="window.vlcApp.player.queue.playPrev()">
+                <span>Previous Track</span><span class="keycap">P</span>
+              </div>
+              <div class="dropdown-item" onclick="window.vlcApp.player.queue.playNext()">
+                <span>Next Track</span><span class="keycap">N</span>
+              </div>
+              <div class="dropdown-separator"></div>
+              <div class="dropdown-item" data-action="loop">
+                <span>Toggle Loop Mode</span><span class="keycap">L</span>
+              </div>
+              <div class="dropdown-item" data-action="shuffle">
+                <span>Toggle Shuffle</span><span class="keycap">R</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="menu-item">
+            <button class="menu-trigger">Audio</button>
+            <div class="menu-dropdown">
+              <div class="dropdown-item" data-action="equalizer">
+                <span>10-Band Graphic Equalizer</span><span class="keycap">Ctrl+E</span>
+              </div>
+              <div class="dropdown-separator"></div>
+              <div class="dropdown-item" onclick="window.vlcApp.player.adjustVolume(0.1)">
+                <span>Volume Boost (+10%)</span><span class="keycap">↑</span>
+              </div>
+              <div class="dropdown-item" onclick="window.vlcApp.player.adjustVolume(-0.1)">
+                <span>Volume Decrease (-10%)</span><span class="keycap">↓</span>
+              </div>
+              <div class="dropdown-item" onclick="window.vlcApp.player.toggleMute()">
+                <span>Mute Audio</span><span class="keycap">M</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="menu-item">
+            <button class="menu-trigger">Video</button>
+            <div class="menu-dropdown">
+              <div class="dropdown-item" data-action="fullscreen">
+                <span>Fullscreen</span><span class="keycap">F</span>
+              </div>
+              <div class="dropdown-item" data-action="pip">
+                <span>Picture in Picture</span><span class="keycap">P</span>
+              </div>
+              <div class="dropdown-item" data-action="equalizer">
+                <span>Adjust Video Effects & Filters...</span>
+              </div>
+              <div class="dropdown-separator"></div>
+              <div class="dropdown-item" onclick="window.vlcApp.player.videoFX.takeSnapshot()">
+                <span>Save Frame Snapshot</span><span class="keycap">Shift+S</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="menu-item">
+            <button class="menu-trigger">Subtitle</button>
+            <div class="menu-dropdown">
+              <div class="dropdown-item" data-action="sync-timeline">
+                <span>Visual Sync Timeline...</span><span class="keycap">Ctrl+T</span>
+              </div>
+              <div class="dropdown-item" data-action="batch-subtitles">
+                <span>Batch Subtitle Matcher...</span><span class="keycap">Ctrl+B</span>
+              </div>
+              <div class="dropdown-item" onclick="document.getElementById('sub-file-input').click()">
+                <span>Add Subtitle File (.srt / .vtt)...</span>
+              </div>
+              <div class="dropdown-separator"></div>
+              <div class="dropdown-item" onclick="window.vlcApp.subtitles.nudgeSyncOffset(-50)">
+                <span>Subtitle Delay -50ms</span><span class="keycap">G</span>
+              </div>
+              <div class="dropdown-item" onclick="window.vlcApp.subtitles.nudgeSyncOffset(50)">
+                <span>Subtitle Delay +50ms</span><span class="keycap">H</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="menu-item">
+            <button class="menu-trigger">Tools</button>
+            <div class="menu-dropdown">
+              <div class="dropdown-item" data-action="toolbar-customizer">
+                <span>Toolbar Layout Customizer...</span>
+              </div>
+              <div class="dropdown-separator"></div>
+              <div class="dropdown-item" data-action="settings">
+                <span>Preferences & Settings (10 Categories)</span><span class="keycap">Ctrl+P</span>
+              </div>
+              <div class="dropdown-item" data-action="settings">
+                <span>Hotkey Manager...</span><span class="keycap">Ctrl+H</span>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </div>
+
+      <!-- Current Media Title Display & Codec Pill -->
+      <div class="header-center">
+        <span class="media-title-display" id="current-media-title">Big Buck Bunny (4K Ultra HD)</span>
+        <span class="badge badge-orange media-codec-badge" id="current-media-codec">4K • H.264 • AAC 5.1 • 60fps</span>
+      </div>
+
+      <!-- Quick Action Buttons & Window Controls -->
+      <div class="header-right">
+        <button class="header-action-btn" id="btn-snapshot-quick" data-tooltip="Capture Frame Snapshot (S)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+        </button>
+
+        <button class="header-action-btn" id="btn-equalizer-modal" data-tooltip="Audio Equalizer & Video Filters (Ctrl+E)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line>
+            <line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line>
+            <circle cx="4" cy="12" r="2"></circle><circle cx="12" cy="10" r="2"></circle><circle cx="20" cy="14" r="2"></circle>
+          </svg>
+        </button>
+
+        <button class="header-action-btn" id="toggle-sidebar-btn" data-tooltip="In-Player Media Library & Queue">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="15" y1="3" x2="15" y2="21"></line>
+          </svg>
+        </button>
+
+        <div style="width: 1px; height: 18px; background: var(--border-subtle); margin: 0 4px;"></div>
+
+        <!-- Window System Mock Controls -->
+        <button class="header-action-btn" title="Minimize">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+        <button class="header-action-btn" title="Maximize">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+          </svg>
+        </button>
+        <button class="header-action-btn window-ctrl-close" title="Close">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Player Viewport -->
+    <main class="player-viewport" id="player-viewport">
+      <video id="main-video" playsinline crossorigin="anonymous"></video>
+
+      <!-- Drag & Drop Overlay Zone -->
+      <div class="drag-drop-overlay" id="drag-drop-overlay">
+        <div class="drag-icon-wrapper">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+        </div>
+        <div class="drag-title">Drop Any Media or Subtitle File Here</div>
+        <div class="drag-subtitle">Supports MP4, WebM, MKV, MP3, FLAC, SRT, VTT, etc.</div>
+      </div>
+
+      <!-- Custom Subtitle Overlay -->
+      <div class="subtitle-overlay-container">
+        <div id="subtitle-text" class="subtitle-text"></div>
+      </div>
+
+      <!-- Music Player Mode View (Active for audio files) -->
+      <div class="music-mode-view" id="music-mode-view">
+        <div class="music-cover-wrapper">
+          <img id="music-cover-img" class="music-cover-img" src="" alt="Album Artwork" />
+        </div>
+        <div class="music-meta">
+          <div class="music-track-title" id="music-track-title">Synthwave Horizon</div>
+          <div class="music-artist-album" id="music-artist-album">Cyber Collective • FLAC 24-bit 96kHz</div>
+        </div>
+        <canvas id="audio-visualizer-canvas" class="audio-visualizer-canvas" width="480" height="100"></canvas>
+      </div>
+
+      <!-- On-Screen Display (OSD) Banner Overlay -->
+      <div class="osd-overlay" id="osd-overlay">
+        <div class="osd-text" id="osd-text">Volume: 100%</div>
+        <div class="osd-meter-bar" id="osd-meter-bar">
+          <div class="osd-meter-fill" id="osd-meter-fill"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Controls Container (Juxtopposed Layout) -->
+    <footer class="player-controls-container" id="player-controls-container">
+
+      <!-- Thick Scrubbing Seek Bar -->
+      <div class="seek-bar-wrapper" id="seek-bar-wrapper">
+        <div class="seek-track">
+          <!-- Audio Waveform Overlay (Juxtopposed Concept) -->
+          <canvas id="seek-waveform-canvas" class="seek-waveform-canvas"></canvas>
+          <div class="seek-buffer-bar" id="seek-buffer-bar"></div>
+          <div id="ab-loop-range" class="ab-loop-highlight"></div>
+          <div class="seek-progress-bar" id="seek-progress-bar">
+            <div class="seek-handle"></div>
+          </div>
+          <div id="ab-marker-a" class="ab-marker">A</div>
+          <div id="ab-marker-b" class="ab-marker">B</div>
+        </div>
+
+        <!-- Hover Preview Tooltip -->
+        <div class="seek-preview-tooltip" id="seek-preview-tooltip">
+          <div class="seek-preview-timecode" id="seek-preview-timecode">00:00</div>
+        </div>
+      </div>
+
+      <!-- Main Controls Row -->
+      <div class="controls-main-row">
+
+        <!-- LEFT-ALIGNED PLAYBACK CLUSTER (Juxtopposed Rule) -->
+        <div class="controls-left-cluster">
+          <button class="ctrl-btn" id="ctrl-prev-btn" data-tooltip="Previous (P)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="19 20 9 12 19 4 19 20"></polygon>
+              <line x1="5" y1="19" x2="5" y2="5"></line>
+            </svg>
+          </button>
+
+          <button class="ctrl-btn" id="ctrl-step-back-btn" data-tooltip="Jump Back 10s (←)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 4v6h6"></path>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+              <text x="12" y="15" font-size="8" font-family="var(--font-mono)" font-weight="700" fill="currentColor" text-anchor="middle">10</text>
+            </svg>
+          </button>
+
+          <!-- Primary Play/Pause Button -->
+          <button class="ctrl-btn ctrl-btn-play" id="ctrl-play-pause-btn" data-tooltip="Play / Pause (Space)">
+            <svg id="play-icon-svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <svg id="pause-icon-svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+              <rect x="6" y="4" width="4" height="16"></rect>
+              <rect x="14" y="4" width="4" height="16"></rect>
+            </svg>
+          </button>
+
+          <button class="ctrl-btn" id="ctrl-step-fwd-btn" data-tooltip="Jump Forward 10s (→)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 4v6h-6"></path>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+              <text x="12" y="15" font-size="8" font-family="var(--font-mono)" font-weight="700" fill="currentColor" text-anchor="middle">10</text>
+            </svg>
+          </button>
+
+          <button class="ctrl-btn" id="ctrl-next-btn" data-tooltip="Next (N)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 4 15 12 5 20 5 4"></polygon>
+              <line x1="19" y1="5" x2="19" y2="19"></line>
+            </svg>
+          </button>
+
+          <button class="ctrl-btn" id="ctrl-stop-btn" data-tooltip="Stop (S)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+            </svg>
+          </button>
+
+          <button class="ctrl-btn" id="ctrl-loop-btn" data-tooltip="Toggle Loop Mode (L)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="17 1 21 5 17 9"></polyline>
+              <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+              <polyline points="7 23 3 19 7 15"></polyline>
+              <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+            </svg>
+          </button>
+
+          <button class="ctrl-btn" id="ctrl-shuffle-btn" data-tooltip="Toggle Shuffle (R)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16 3 21 3 21 8"></polyline>
+              <line x1="4" y1="20" x2="21" y2="3"></line>
+              <polyline points="21 16 21 21 16 21"></polyline>
+              <line x1="15" y1="15" x2="21" y2="21"></line>
+              <line x1="4" y1="4" x2="9" y2="9"></line>
+            </svg>
+          </button>
+
+          <!-- A-B Repeat Loop Button (Juxtopposed VLC Signature Feature) -->
+          <button class="ctrl-btn" id="ctrl-ab-loop-btn" data-tooltip="Set A-B Repeat Loop">
+            <span style="font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--text-secondary);">A⇄B</span>
+          </button>
+
+          <!-- Time Display (Elapsed / Total) -->
+          <div class="time-display" id="time-display" data-tooltip="Click to toggle remaining time">
+            <span class="time-current" id="time-current">00:00</span>
+            <span class="time-separator">/</span>
+            <span class="time-duration" id="time-duration">00:00</span>
+          </div>
+        </div>
+
+        <!-- RIGHT-ALIGNED UTILITIES CLUSTER -->
+        <div class="controls-right-cluster">
+
+          <!-- Stylized Traffic Cone Volume Slider (Up to 200%) -->
+          <div class="volume-control-box">
+            <button class="volume-cone-icon-btn" id="volume-cone-icon-btn" data-tooltip="Mute / Unmute (M)">
+              <svg width="20" height="20" viewBox="0 0 64 64" fill="none">
+                <path d="M12 55L24 16H40L52 55H12Z" fill="currentColor" />
+                <path d="M17 48L20 40H44L47 48H17Z" fill="#FFFFFF" />
+                <path d="M22 34L25 24H39L42 34H22Z" fill="#FFFFFF" />
+              </svg>
+            </button>
+            <div class="volume-slider-wrapper" id="volume-slider-wrapper" data-tooltip="Volume: Scroll or Click (Up to 200%)">
+              <div class="volume-bar-bg">
+                <div class="volume-bar-fill" id="volume-bar-fill"></div>
+              </div>
+            </div>
+            <span class="volume-pct-label" id="volume-pct-label">100%</span>
+          </div>
+
+          <!-- Playback Speed Button -->
+          <button class="speed-selector-btn" id="btn-speed-selector" data-popover-target="popover-speed" data-tooltip="Playback Speed">
+            <span id="current-speed-label">1.0x</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+
+          <!-- Audio Track Selector Button -->
+          <button class="ctrl-btn" data-popover-target="popover-audio" data-tooltip="Audio Tracks & Equalizer">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18V5l12-2v13"></path>
+              <circle cx="6" cy="18" r="3"></circle>
+              <circle cx="18" cy="16" r="3"></circle>
+            </svg>
+          </button>
+
+          <!-- Subtitle Track Selector Button -->
+          <button class="ctrl-btn" data-popover-target="popover-subtitles" data-tooltip="Subtitles & Sync Timeline">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <path d="M7 15h4M15 15h2M7 11h2M13 11h4"></path>
+            </svg>
+          </button>
+
+          <!-- Visual Sync Timeline Shortcut Button -->
+          <button class="ctrl-btn" id="btn-visual-sync-modal" data-tooltip="Visual Subtitle Timeline (Ctrl+T)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="12" x2="18" y2="12"></line>
+              <rect x="4" y="6" width="16" height="12" rx="2"></rect>
+            </svg>
+          </button>
+
+          <!-- Picture in Picture (PiP) -->
+          <button class="ctrl-btn" id="btn-pip" data-tooltip="Picture in Picture (P)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <rect x="12" y="10" width="8" height="6" rx="1" fill="currentColor"></rect>
+            </svg>
+          </button>
+
+          <!-- Fullscreen Toggle -->
+          <button class="ctrl-btn" id="btn-fullscreen" data-tooltip="Fullscreen (F)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </footer>
+
+    <!-- IN-PLAYER SLIDE-OUT LIBRARY & ACTIVE QUEUE SIDEBAR -->
+    <aside class="library-sidebar" id="library-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-tabs">
+          <button class="sidebar-tab-btn active" data-tab="queue">Active Queue</button>
+          <button class="sidebar-tab-btn" data-tab="library">Media Library</button>
+        </div>
+        <button class="sidebar-close-btn" id="close-sidebar-btn" title="Close Sidebar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="sidebar-search-box">
+        <input type="text" class="sidebar-search-input" id="sidebar-search-input" placeholder="Search queue or library..." />
+      </div>
+
+      <div class="sidebar-body">
+        <!-- Active Temporary Queue List -->
+        <div id="sidebar-queue-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+
+        <!-- Saved Media Library Grid -->
+        <div id="sidebar-library-grid" class="library-grid" style="display: none;"></div>
+      </div>
+    </aside>
+
+    <!-- QUICK POPOVERS -->
+    <!-- Speed Popover -->
+    <div class="quick-popover" id="popover-speed">
+      <div class="popover-header">Playback Speed</div>
+      <button class="popover-option-btn speed-option-btn" data-speed="0.25">0.25x (Slow)</button>
+      <button class="popover-option-btn speed-option-btn" data-speed="0.5">0.5x</button>
+      <button class="popover-option-btn speed-option-btn" data-speed="0.75">0.75x</button>
+      <button class="popover-option-btn speed-option-btn selected" data-speed="1.0">1.0x (Normal)</button>
+      <button class="popover-option-btn speed-option-btn" data-speed="1.25">1.25x</button>
+      <button class="popover-option-btn speed-option-btn" data-speed="1.5">1.5x (Fast)</button>
+      <button class="popover-option-btn speed-option-btn" data-speed="2.0">2.0x (Double)</button>
+    </div>
+
+    <!-- Audio Track Popover -->
+    <div class="quick-popover" id="popover-audio">
+      <div class="popover-header">Audio Stream & Equalizer</div>
+      <button class="popover-option-btn selected">Track 1: English (Stereo 2.0)</button>
+      <button class="popover-option-btn">Track 2: Director Commentary</button>
+      <div class="dropdown-separator"></div>
+      <button class="popover-option-btn" onclick="window.vlcApp.ui.openModal('modal-equalizer-fx'); window.vlcApp.ui.closeAllPopovers();">
+        <span>Open Graphic Equalizer...</span>
+      </button>
+    </div>
+
+    <!-- Subtitles Popover -->
+    <div class="quick-popover" id="popover-subtitles">
+      <div class="popover-header">Subtitles Management</div>
+      <button class="popover-option-btn selected" id="popover-sub-toggle">Disable Subtitles</button>
+      <button class="popover-option-btn" onclick="window.vlcApp.ui.openModal('modal-visual-sync'); window.vlcApp.ui.closeAllPopovers();">
+        <span>Visual Sync Timeline...</span>
+      </button>
+      <button class="popover-option-btn" onclick="document.getElementById('sub-file-input').click()">
+        <span>Upload .SRT / .VTT File</span>
+      </button>
+      <input type="file" id="sub-file-input" accept=".srt,.vtt,.sub" style="display: none;" />
+    </div>
+
+    <!-- MODAL 1: OPEN MEDIA (Juxtopposed Untangled Tabs) -->
+    <div class="modal-backdrop" id="modal-open-media">
+      <div class="modal-window">
+        <div class="modal-header">
+          <div class="modal-title-box">
+            <svg class="modal-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span class="modal-title">Open Media</span>
+          </div>
+          <button class="modal-close-btn">&times;</button>
+        </div>
+
+        <div class="modal-tabs">
+          <button class="modal-tab-btn active" data-tab="file">Local File</button>
+          <button class="modal-tab-btn" data-tab="network">Network Stream</button>
+          <button class="modal-tab-btn" data-tab="capture">Capture Device</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Tab 1: Local File -->
+          <div class="open-media-tab-panel" id="tab-open-file" style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="border: 2px dashed var(--border-medium); border-radius: var(--radius-md); padding: 32px; text-align: center; cursor: pointer;" onclick="document.getElementById('local-file-picker').click()">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--vlc-orange)" stroke-width="2" style="margin-bottom: 8px;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <div style="font-weight: 600; margin-bottom: 4px;">Click to Select Files or Drag & Drop</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Supports MP4, WebM, MKV, AVI, MP3, FLAC, WAV, SRT</div>
+            </div>
+            <input type="file" id="local-file-picker" multiple style="display: none;" onchange="window.vlcApp.player.handleDroppedFiles(this.files); window.vlcApp.ui.closeAllModals();" />
+          </div>
+
+          <!-- Tab 2: Network Stream -->
+          <div class="open-media-tab-panel" id="tab-open-network" style="display: none; flex-direction: column; gap: 14px;">
+            <p style="font-size: 13px; color: var(--text-secondary);">Enter a network URL (HTTP/HTTPS, HLS .m3u8, RTSP, or direct MP4/WebM stream):</p>
+            <form id="network-stream-form" style="display: flex; gap: 8px;">
+              <input type="url" id="network-stream-url" placeholder="https://example.com/live/stream.m3u8" style="flex: 1;" required />
+              <button type="submit" class="btn-primary">Play Stream</button>
+            </form>
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 10px;">
+              <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Quick Presets:</span>
+              <button class="btn-secondary" style="text-align: left;" onclick="document.getElementById('network-stream-url').value='https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4'">
+                Tears of Steel 4K (Google Storage Direct)
+              </button>
+              <button class="btn-secondary" style="text-align: left;" onclick="document.getElementById('network-stream-url').value='https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4'">
+                Elephants Dream 1080p (Google Storage Direct)
+              </button>
+            </div>
+          </div>
+
+          <!-- Tab 3: Capture Device -->
+          <div class="open-media-tab-panel" id="tab-open-capture" style="display: none; flex-direction: column; gap: 16px;">
+            <p style="font-size: 13px; color: var(--text-secondary);">Stream live from your local webcam, microphone, or system screen:</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <button class="btn-secondary" id="btn-capture-screen" style="padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--vlc-orange)" stroke-width="2">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+                <span style="font-weight: 600;">Share Desktop Screen</span>
+              </button>
+              <button class="btn-secondary" id="btn-capture-webcam" style="padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--vlc-orange)" stroke-width="2">
+                  <path d="M23 7l-7 5 7 5V7z"></path>
+                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                </svg>
+                <span style="font-weight: 600;">Webcam & Microphone</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-secondary modal-cancel-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 2: VISUAL SUBTITLE & AUDIO SYNC TIMELINE (Juxtopposed Standout Feature) -->
+    <div class="modal-backdrop" id="modal-visual-sync">
+      <div class="modal-window">
+        <div class="modal-header">
+          <div class="modal-title-box">
+            <svg class="modal-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="12" x2="18" y2="12"></line>
+              <rect x="4" y="6" width="16" height="12" rx="2"></rect>
+            </svg>
+            <span class="modal-title">Visual Subtitle & Audio Sync Timeline</span>
+          </div>
+          <button class="modal-close-btn">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="sync-timeline-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 13px; font-weight: 600;">Visual Alignment Timeline</span>
+              <span style="font-size: 11px; color: var(--text-muted);">Drag block left or right to sync</span>
+            </div>
+
+            <!-- Interactive Visual Draggable Timeline -->
+            <div class="sync-visual-timeline" id="sync-visual-timeline">
+              <div class="sync-center-line"></div>
+              <div class="sync-draggable-track" id="sync-draggable-track">
+                <span>Subtitle Track Block</span>
+              </div>
+            </div>
+
+            <!-- Offset Readout in Milliseconds -->
+            <div class="sync-offset-readout">
+              <span class="sync-offset-value" id="sync-offset-value">0</span>
+              <span class="sync-offset-unit">ms offset</span>
+            </div>
+
+            <!-- Quick Precision Nudge Buttons -->
+            <div class="sync-nudge-buttons">
+              <button class="nudge-btn" data-nudge="-250">-250ms</button>
+              <button class="nudge-btn" data-nudge="-50">-50ms (G)</button>
+              <button class="nudge-btn" data-nudge="0" style="color: var(--vlc-orange);">Reset (0ms)</button>
+              <button class="nudge-btn" data-nudge="50">+50ms (H)</button>
+              <button class="nudge-btn" data-nudge="250">+250ms</button>
+            </div>
+          </div>
+
+          <!-- Per-Series Presets (Juxtopposed UX Improvement) -->
+          <div class="sync-preset-row">
+            <input type="checkbox" id="sync-save-preset-checkbox" class="custom-checkbox" checked />
+            <label for="sync-save-preset-checkbox" style="font-size: 13px; cursor: pointer;">
+              Remember this synchronization offset and appearance for this series/folder
+            </label>
+          </div>
+
+          <!-- Subtitle Appearance Customization -->
+          <div class="sync-timeline-card">
+            <span style="font-size: 13px; font-weight: 600;">Subtitle Styling</span>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 6px;">
+              <div>
+                <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Font Size (px)</label>
+                <input type="number" id="sub-font-size-input" value="24" min="14" max="48" style="width: 100%;" />
+              </div>
+              <div>
+                <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Text Color</label>
+                <input type="color" id="sub-text-color-input" value="#FFFFFF" style="width: 100%; height: 38px; padding: 2px;" />
+              </div>
+              <div>
+                <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px;">Background Opacity</label>
+                <input type="range" id="sub-bg-opacity-input" min="0" max="1" step="0.1" value="0.5" style="width: 100%; accent-color: var(--vlc-orange);" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-primary modal-close-btn">Done</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 3: 10-BAND EQUALIZER & VIDEO EFFECTS -->
+    <div class="modal-backdrop" id="modal-equalizer-fx">
+      <div class="modal-window large">
+        <div class="modal-header">
+          <div class="modal-title-box">
+            <svg class="modal-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line>
+              <line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line>
+              <circle cx="4" cy="12" r="2"></circle><circle cx="12" cy="10" r="2"></circle><circle cx="20" cy="14" r="2"></circle>
+            </svg>
+            <span class="modal-title">Audio Equalizer & Video Effects</span>
+          </div>
+          <button class="modal-close-btn">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Audio Equalizer Section -->
+          <div class="setting-group">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="setting-group-title">10-Band Graphic Equalizer</span>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <label style="font-size: 12px; color: var(--text-muted);">Presets:</label>
+                <select id="eq-preset-select" style="padding: 4px 8px; font-size: 12px;">
+                  <option value="flat">Flat</option>
+                  <option value="rock">Rock</option>
+                  <option value="techno">Techno</option>
+                  <option value="bass-boost">Bass Boost</option>
+                  <option value="club">Club</option>
+                  <option value="pop">Pop</option>
+                  <option value="vocal">Vocal Accent</option>
+                  <option value="classical">Classical</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Preamp Slider -->
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+              <span style="font-size: 12px; color: var(--text-secondary); width: 60px;">Preamp:</span>
+              <input type="range" id="eq-preamp-slider" min="-12" max="12" step="0.5" value="0" style="flex: 1; accent-color: var(--vlc-orange);" />
+              <span id="eq-preamp-val" style="font-family: var(--font-mono); font-size: 12px; width: 45px; text-align: right;">0 dB</span>
+            </div>
+
+            <!-- 10 Sliders Container -->
+            <div class="equalizer-bands-row" id="equalizer-bands-row"></div>
+          </div>
+
+          <!-- Video Effects & Filters Section -->
+          <div class="setting-group" style="margin-top: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="setting-group-title">Real-Time Video Adjustments</span>
+              <button class="btn-secondary" id="btn-reset-video-fx" style="padding: 4px 10px; font-size: 11px;">Reset All</button>
+            </div>
+
+            <div class="video-fx-sliders-grid">
+              <div class="video-fx-item">
+                <div class="video-fx-header">
+                  <span>Brightness</span><span id="fx-brightness-val">100%</span>
+                </div>
+                <input type="range" class="fx-slider" id="fx-brightness" min="0" max="200" value="100" />
+              </div>
+
+              <div class="video-fx-item">
+                <div class="video-fx-header">
+                  <span>Contrast</span><span id="fx-contrast-val">100%</span>
+                </div>
+                <input type="range" class="fx-slider" id="fx-contrast" min="0" max="200" value="100" />
+              </div>
+
+              <div class="video-fx-item">
+                <div class="video-fx-header">
+                  <span>Saturation</span><span id="fx-saturate-val">100%</span>
+                </div>
+                <input type="range" class="fx-slider" id="fx-saturate" min="0" max="300" value="100" />
+              </div>
+
+              <div class="video-fx-item">
+                <div class="video-fx-header">
+                  <span>Hue Rotate</span><span id="fx-hueRotate-val">0°</span>
+                </div>
+                <input type="range" class="fx-slider" id="fx-hueRotate" min="0" max="360" value="0" />
+              </div>
+
+              <div class="video-fx-item">
+                <div class="video-fx-header">
+                  <span>Blur</span><span id="fx-blur-val">0px</span>
+                </div>
+                <input type="range" class="fx-slider" id="fx-blur" min="0" max="20" value="0" />
+              </div>
+
+              <!-- Aspect Ratio Selection -->
+              <div class="video-fx-item">
+                <div class="video-fx-header"><span>Aspect Ratio</span></div>
+                <div style="display: flex; gap: 6px;">
+                  <button class="btn-secondary active" data-aspect-ratio="default" style="padding: 4px 8px; font-size: 11px;">Original</button>
+                  <button class="btn-secondary" data-aspect-ratio="16:9" style="padding: 4px 8px; font-size: 11px;">16:9</button>
+                  <button class="btn-secondary" data-aspect-ratio="4:3" style="padding: 4px 8px; font-size: 11px;">4:3</button>
+                  <button class="btn-secondary" data-aspect-ratio="21:9" style="padding: 4px 8px; font-size: 11px;">21:9</button>
+                  <button class="btn-secondary" data-aspect-ratio="fill" style="padding: 4px 8px; font-size: 11px;">Fill</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-primary modal-close-btn">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 4: SETTINGS & 10 CATEGORIES (Juxtopposed Reorganization) -->
+    <div class="modal-backdrop" id="modal-settings">
+      <div class="modal-window large">
+        <div class="modal-header">
+          <div class="modal-title-box">
+            <svg class="modal-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span class="modal-title">Preferences & Settings</span>
+          </div>
+          <button class="modal-close-btn">&times;</button>
+        </div>
+
+        <div style="padding: 10px 20px; border-bottom: 1px solid var(--border-subtle);">
+          <input type="text" id="settings-search-input" placeholder="Search settings or hotkeys..." style="width: 100%;" />
+        </div>
+
+        <div class="modal-body" style="padding: 0;">
+          <div class="settings-layout" style="padding: 16px 20px;">
+            <!-- 10 Categories Sidebar -->
+            <div class="settings-sidebar">
+              <button class="settings-nav-item active" data-category="general">General</button>
+              <button class="settings-nav-item" data-category="interface">Interface</button>
+              <button class="settings-nav-item" data-category="controls">Controls & Hotkeys</button>
+              <button class="settings-nav-item" data-category="playback">Playback</button>
+              <button class="settings-nav-item" data-category="video">Video</button>
+              <button class="settings-nav-item" data-category="audio">Audio</button>
+              <button class="settings-nav-item" data-category="subtitles">Subtitles</button>
+              <button class="settings-nav-item" data-category="library">Library</button>
+              <button class="settings-nav-item" data-category="network">Network</button>
+              <button class="settings-nav-item" data-category="performance">Performance</button>
+            </div>
+
+            <!-- Content Panel -->
+            <div class="settings-content-panel">
+              <!-- Category: General -->
+              <div class="settings-category-panel" id="settings-panel-general">
+                <div class="setting-group">
+                  <div class="setting-group-title">General Preferences</div>
+                  <div class="setting-row">
+                    <div class="setting-info">
+                      <span class="setting-label">Resume playback position</span>
+                      <span class="setting-desc">Ask to continue where you left off on previously played files</span>
+                    </div>
+                    <select><option>Always</option><option>Ask</option><option>Never</option></select>
+                  </div>
+                  <div class="setting-row">
+                    <div class="setting-info">
+                      <span class="setting-label">Allow only one running instance</span>
+                      <span class="setting-desc">Enqueue files in one player instance when opened from system</span>
+                    </div>
+                    <input type="checkbox" class="custom-checkbox" checked />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Category: Interface -->
+              <div class="settings-category-panel" id="settings-panel-interface" style="display: none;">
+                <div class="setting-group">
+                  <div class="setting-group-title">Interface & Aesthetics</div>
+                  <div class="setting-row">
+                    <div class="setting-info">
+                      <span class="setting-label">Theme Mode</span>
+                      <span class="setting-desc">Juxtopposed dark graphite with traffic cone orange accents</span>
+                    </div>
+                    <select><option>Deep Graphite Dark</option><option>OLED True Black</option></select>
+                  </div>
+                  <div class="setting-row">
+                    <div class="setting-info">
+                      <span class="setting-label">Auto-hide chrome timeout</span>
+                      <span class="setting-desc">Delay before concealing header and bottom controls during playback</span>
+                    </div>
+                    <select><option>2.5 seconds</option><option>4.0 seconds</option><option>Never hide</option></select>
+                  </div>
+                  <div class="setting-row">
+                    <div class="setting-info">
+                      <span class="setting-label">On-Screen Display (OSD) notifications</span>
+                      <span class="setting-desc">Display feedback badges when adjusting volume, speed, or seeking</span>
+                    </div>
+                    <input type="checkbox" class="custom-checkbox" checked />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Category: Controls & Hotkeys (Searchable Table) -->
+              <div class="settings-category-panel" id="settings-panel-controls" style="display: none;">
+                <div class="setting-group">
+                  <div class="setting-group-title">Keyboard Shortcuts Manager</div>
+                  <table class="hotkeys-table">
+                    <thead>
+                      <tr><th>Action</th><th>Key Combination</th><th>Context</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>Play / Pause</td><td><span class="keycap">Space</span> / <span class="keycap">K</span></td><td>Global</td></tr>
+                      <tr><td>Fullscreen Toggle</td><td><span class="keycap">F</span></td><td>Global</td></tr>
+                      <tr><td>Mute Audio</td><td><span class="keycap">M</span></td><td>Global</td></tr>
+                      <tr><td>Jump -10s / +10s</td><td><span class="keycap">←</span> / <span class="keycap">→</span></td><td>Global</td></tr>
+                      <tr><td>Volume Up / Down</td><td><span class="keycap">↑</span> / <span class="keycap">↓</span></td><td>Global</td></tr>
+                      <tr><td>Subtitle Delay -50ms / +50ms</td><td><span class="keycap">G</span> / <span class="keycap">H</span></td><td>Subtitles</td></tr>
+                      <tr><td>Audio Delay -50ms / +50ms</td><td><span class="keycap">J</span> / <span class="keycap">K</span></td><td>Audio</td></tr>
+                      <tr><td>Next / Previous Track</td><td><span class="keycap">N</span> / <span class="keycap">P</span></td><td>Playlist</td></tr>
+                      <tr><td>Take Frame Snapshot</td><td><span class="keycap">S</span></td><td>Video</td></tr>
+                      <tr><td>Step Single Frame Forward</td><td><span class="keycap">E</span></td><td>Video</td></tr>
+                      <tr><td>Toggle Loop Mode</td><td><span class="keycap">L</span></td><td>Playlist</td></tr>
+                      <tr><td>Toggle Shuffle</td><td><span class="keycap">R</span></td><td>Playlist</td></tr>
+                      <tr><td>Picture-in-Picture</td><td><span class="keycap">P</span></td><td>Video</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Category: Audio -->
+              <div class="settings-category-panel" id="settings-panel-audio" style="display: none;">
+                <div class="setting-group">
+                  <div class="setting-group-title">Audio Processing & Output</div>
+                  <div class="setting-row">
+                    <div class="setting-info">
+                      <span class="setting-label">Allow 200% Volume Boost</span>
+                      <span class="setting-desc">VLC signature overdrive amplifier for quiet media files</span>
+                    </div>
+                    <input type="checkbox" class="custom-checkbox" checked />
+                  </div>
+                  <div class="setting-row">
+                    <div class="setting-info">
+                      <span class="setting-label">Audio Normalization</span>
+                      <span class="setting-desc">Even out sudden dynamic volume spikes in movies</span>
+                    </div>
+                    <input type="checkbox" class="custom-checkbox" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Other categories fallback message -->
+              <div class="settings-category-panel" id="settings-panel-playback" style="display: none;">
+                <div class="setting-group"><div class="setting-group-title">Playback Settings</div><p style="color:var(--text-muted);">Default speed, auto-play next episode, and hardware decoding options are active.</p></div>
+              </div>
+              <div class="settings-category-panel" id="settings-panel-video" style="display: none;">
+                <div class="setting-group"><div class="setting-group-title">Video Output</div><p style="color:var(--text-muted);">WebGL / CSS Canvas hardware compositing enabled with 60fps refresh.</p></div>
+              </div>
+              <div class="settings-category-panel" id="settings-panel-subtitles" style="display: none;">
+                <div class="setting-group"><div class="setting-group-title">Subtitle Engine</div><p style="color:var(--text-muted);">Auto-detection fuzzy match score: Normal. Visual timeline sync enabled.</p></div>
+              </div>
+              <div class="settings-category-panel" id="settings-panel-library" style="display: none;">
+                <div class="setting-group"><div class="setting-group-title">Media Library</div><p style="color:var(--text-muted);">In-player slide-out library separates temporary queue from permanent collections.</p></div>
+              </div>
+              <div class="settings-category-panel" id="settings-panel-network" style="display: none;">
+                <div class="setting-group"><div class="setting-group-title">Network Streams</div><p style="color:var(--text-muted);">CORS proxy and HLS adaptive bitrate streaming enabled.</p></div>
+              </div>
+              <div class="settings-category-panel" id="settings-panel-performance" style="display: none;">
+                <div class="setting-group"><div class="setting-group-title">Performance & Acceleration</div><p style="color:var(--text-muted);">GPU hardware acceleration enabled for video decoding and canvas visualizers.</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+    <!-- MODAL 5: DRAG-AND-DROP TOOLBAR CUSTOMIZER (Juxtopposed Concept) -->
+    <div class="modal-backdrop" id="modal-toolbar-customizer">
+      <div class="modal-window large">
+        <div class="modal-header">
+          <div class="modal-title-box">
+            <svg class="modal-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+            <span class="modal-title">Toolbar Layout Customizer</span>
+          </div>
+          <button class="modal-close-btn">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 600; font-size: 14px;">Interactive Toolbar Profile</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Choose a curated layout preset or toggle individual widgets</div>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn-secondary active" id="profile-btn-standard" onclick="window.vlcApp.player.applyToolbarProfile('standard');">Standard</button>
+              <button class="btn-secondary" id="profile-btn-minimal" onclick="window.vlcApp.player.applyToolbarProfile('minimal');">Minimalist</button>
+              <button class="btn-secondary" id="profile-btn-pro" onclick="window.vlcApp.player.applyToolbarProfile('pro');">Pro Editor</button>
+            </div>
+          </div>
+
+          <div class="toolbar-builder-canvas">
+            <span style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Available Toolbar Widgets (Click to toggle)</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <div class="toolbar-widget-pill enabled">▶ Play / Pause</div>
+              <div class="toolbar-widget-pill enabled">⏮ Previous / Next ⏭</div>
+              <div class="toolbar-widget-pill enabled">↺ 10s Step Jump ↻</div>
+              <div class="toolbar-widget-pill enabled">⏹ Stop</div>
+              <div class="toolbar-widget-pill enabled">🔁 Loop & Shuffle 🔀</div>
+              <div class="toolbar-widget-pill enabled">A⇄B Repeat Loop</div>
+              <div class="toolbar-widget-pill enabled">⏱ Elapsed / Duration</div>
+              <div class="toolbar-widget-pill enabled">🔊 Cone Volume (200%)</div>
+              <div class="toolbar-widget-pill enabled">⚡ Speed Selector</div>
+              <div class="toolbar-widget-pill enabled">💬 Subtitle Track</div>
+              <div class="toolbar-widget-pill enabled">🎵 Audio Stream</div>
+              <div class="toolbar-widget-pill enabled">🎚 Visual Equalizer</div>
+              <div class="toolbar-widget-pill enabled">📷 Frame Snapshot</div>
+              <div class="toolbar-widget-pill enabled">📺 Picture-in-Picture</div>
+              <div class="toolbar-widget-pill enabled">⛶ Fullscreen</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-primary modal-close-btn">Save Layout</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 6: BATCH SUBTITLE FETCHING & LINKING (Juxtopposed Concept) -->
+    <div class="modal-backdrop" id="modal-batch-subtitles">
+      <div class="modal-window">
+        <div class="modal-header">
+          <div class="modal-title-box">
+            <svg class="modal-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <path d="M7 15h4M15 15h2M7 11h2M13 11h4"></path>
+            </svg>
+            <span class="modal-title">Batch Subtitle Matcher</span>
+          </div>
+          <button class="modal-close-btn">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-size: 13px; font-weight: 600;">Active Queue Titles</span>
+            <select id="batch-sub-lang-select" style="padding: 4px 8px; font-size: 12px;">
+              <option value="en">English [en]</option>
+              <option value="es">Spanish [es]</option>
+              <option value="fr">French [fr]</option>
+              <option value="de">German [de]</option>
+              <option value="ja">Japanese [ja]</option>
+            </select>
+          </div>
+
+          <div class="batch-sub-list">
+            <div class="batch-sub-item">
+              <div>
+                <div class="batch-sub-name">Big Buck Bunny (4K Ultra HD)</div>
+                <div style="font-size: 11px; color: var(--text-muted);">BigBuckBunny.mp4</div>
+              </div>
+              <div class="batch-sub-status">
+                <span class="badge badge-green">Matched (100%)</span>
+              </div>
+            </div>
+
+            <div class="batch-sub-item">
+              <div>
+                <div class="batch-sub-name">Elephants Dream</div>
+                <div style="font-size: 11px; color: var(--text-muted);">ElephantsDream.mp4</div>
+              </div>
+              <div class="batch-sub-status">
+                <button class="btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="this.outerHTML='<span class=\'badge badge-green\'>Matched (98%)</span>'">
+                  Auto-Fetch Subtitle
+                </button>
+              </div>
+            </div>
+
+            <div class="batch-sub-item">
+              <div>
+                <div class="batch-sub-name">Tears of Steel</div>
+                <div style="font-size: 11px; color: var(--text-muted);">TearsOfSteel.mp4</div>
+              </div>
+              <div class="batch-sub-status">
+                <button class="btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="this.outerHTML='<span class=\'badge badge-green\'>Matched (99%)</span>'">
+                  Auto-Fetch Subtitle
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-secondary modal-cancel-btn">Close</button>
+          <button class="btn-primary modal-close-btn" onclick="window.vlcApp.player.showOSD('Batch Subtitles Synced!');">Apply All</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JavaScript Engines & App -->
+  <script src="js/audio-engine.js"></script>
+  <script src="js/video-fx.js"></script>
+  <script src="js/subtitles.js"></script>
+  <script src="js/queue.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

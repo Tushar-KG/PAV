@@ -1,0 +1,76 @@
+/* VLC Plus - Modern Design Tokens & Theme Variables
+ * Inspired by Juxtopposed's "I Redesigned VLC After 25 Years"
+ * Signature Traffic Cone Orange (#FF6B00 / #FF7700), Utilitarian Softened Rectangles,
+ * Deep Graphite Dark Mode, Glassmorphic Panels, and Crisp Monochrome Player Controls.
+ */
+
+:root {
+  /* Brand & Signature Accent Colors */
+  --vlc-orange: #FF6A00;
+  --vlc-orange-glow: rgba(255, 106, 0, 0.45);
+  --vlc-orange-hover: #FF8024;
+  --vlc-orange-dark: #D45500;
+  --vlc-amber: #FFB300;
+  --vlc-cone-white: #FFFFFF;
+  --vlc-cone-stripe: #E5E7EB;
+
+  /* Surface & Background Colors */
+  --bg-main: #0B0D12;
+  --bg-elevated: #11141D;
+  --bg-card: #161A26;
+  --bg-card-hover: #1D2232;
+  --bg-chrome: rgba(12, 14, 20, 0.88);
+  --bg-glass: rgba(18, 22, 33, 0.72);
+  --bg-glass-card: rgba(26, 32, 48, 0.6);
+  --bg-overlay: rgba(5, 7, 10, 0.75);
+
+  /* Borders & Dividers */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.14);
+  --border-highlight: rgba(255, 106, 0, 0.4);
+  --border-active: var(--vlc-orange);
+
+  /* Typography Colors */
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --text-dim: #475569;
+  --text-on-orange: #FFFFFF;
+
+  /* Semantic Feedback */
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  --color-info: #3B82F6;
+
+  /* Form & Geometry (Utilitarian Softened Rectangles) */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Shadows & Depth */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 10px 28px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 20px var(--vlc-orange-glow);
+  --shadow-cone: 0 8px 24px rgba(255, 106, 0, 0.25);
+
+  /* Animations & Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 350ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Fonts */
+  --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Dimensions */
+  --header-height: 48px;
+  --controls-height: 84px;
+  --seekbar-height: 8px;
+  --seekbar-hover-height: 12px;
+  --sidebar-width: 380px;
+}
