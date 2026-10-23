@@ -1,5 +1,3 @@
 @echo off
-title PAV - Play Any Video
-echo Starting PAV (Play Any Video) Desktop Application...
-cd /d "%~dp0"
-npm start
+:: PAV (Play Any Video) - Windows Desktop Application Launcher
+start "" "%~dp0dist\PAV-win32-x64\PAV.exe" %*

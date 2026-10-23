@@ -28,9 +28,18 @@ While celebrating the ability to play almost any codec across every platform, de
 
 ## 🚀 Quick Start
 
-No build tools or heavy dependencies required! Run natively in any modern web browser.
+Run natively in any modern web browser or as a standalone Windows desktop application.
 
-### Option 1: Run with Python HTTP Server
+### Option 1: Standalone Windows Desktop App
+- **Downloadable Release**: Grab the pre-built standalone zip from the [GitHub Releases](https://github.com/Tushar-KG/PAV/releases) page.
+- **Direct Launcher**: Run `PAV.bat` or `npm start` after cloning.
+- **Build from Source**:
+  ```bash
+  npm install
+  npm run build:exe
+  ```
+
+### Option 2: Run with Python HTTP Server
 ```bash
 # Clone this repository
 git clone https://github.com/Tushar-KG/PAV.git
@@ -41,7 +50,7 @@ python -m http.server 8080
 ```
 Open **[http://localhost:8080](http://localhost:8080)** in your browser (Firefox, Chrome, Edge).
 
-### Option 2: Open Directly
+### Option 3: Open Directly in Browser
 Simply double-click `index.html` to open it directly in Firefox or any modern web browser.
 
 ---

@@ -23,7 +23,7 @@ function createWindow() {
     backgroundColor: '#0B0D12',
     frame: false, // Sleek frameless custom titlebar
     title: 'PAV — Play Any Video',
-    icon: path.join(__dirname, 'favicon.jpg'),
+    icon: path.join(__dirname, 'icon.ico'),
     show: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
