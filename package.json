@@ -1,0 +1,25 @@
+{
+  "name": "pav-player",
+  "version": "1.0.0",
+  "description": "PAV (Play Any Video) - Modern Desktop Media Player",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "keywords": [
+    "vlc",
+    "player",
+    "media",
+    "video",
+    "audio",
+    "streaming",
+    "desktop-app"
+  ],
+  "author": "Tushar_KG",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.4.11"
+  }
+}

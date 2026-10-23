@@ -105,7 +105,41 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsText(file);
       }
     });
+  // --- Desktop Application Integration (Electron) ---
+  if (window.electronAPI) {
+    document.getElementById('win-btn-minimize').addEventListener('click', () => {
+      window.electronAPI.minimize();
+    });
+
+    document.getElementById('win-btn-maximize').addEventListener('click', () => {
+      window.electronAPI.maximize();
+    });
+
+    document.getElementById('win-btn-close').addEventListener('click', () => {
+      window.electronAPI.close();
+    });
+
+    // Native file open on startup or second instance (e.g. Open with PAV)
+    window.electronAPI.onOpenFile((filePath) => {
+      const fileName = filePath.split(/[\\/]/).pop();
+      const ext = fileName.split('.').pop().toLowerCase();
+      const isAudio = ['mp3', 'flac', 'wav', 'ogg', 'm4a', 'aac'].includes(ext);
+
+      const newItem = {
+        id: `file-${Date.now()}`,
+        title: fileName,
+        artist: 'Local Media',
+        type: isAudio ? 'audio' : 'video',
+        duration: 'Local File',
+        codec: ext.toUpperCase(),
+        src: `file://${filePath.replace(/\\/g, '/')}`,
+        poster: isAudio ? 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80' : '',
+        hasSubtitles: false
+      };
+      player.queue.addToQueue(newItem, true);
+      player.showOSD(`Playing: ${fileName}`);
+    });
   }
 
-  console.log('VLC Plus initialized successfully.');
+  console.log('PAV (Play Any Video) initialized successfully.');
 });

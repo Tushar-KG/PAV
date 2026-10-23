@@ -1,6 +1,6 @@
 /* VLC Plus - Player Viewport, Chrome, OSD, Subtitles & Music Mode */
 
-/* Top Header Bar */
+/* Top Header Bar (Desktop Native Drag Region) */
 .player-header {
   position: absolute;
   top: 0;
@@ -17,46 +17,78 @@
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-subtle);
   transition: opacity var(--transition-normal), transform var(--transition-normal);
+  -webkit-app-region: drag; /* Allows dragging desktop window by header */
+}
+
+/* Make all interactive buttons and menus non-draggable so clicks work */
+.player-header button,
+.player-header nav,
+.player-header input,
+.player-header .menu-dropdown {
+  -webkit-app-region: no-drag;
 }
 
 .header-left {
   display: flex;
   align-items: center;
   gap: 16px;
+  -webkit-app-region: no-drag;
 }
 
 .brand-logo-btn {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 4px 8px;
+  padding: 4px 10px;
   border-radius: var(--radius-sm);
-  background: rgba(255, 106, 0, 0.08);
-  border: 1px solid rgba(255, 106, 0, 0.25);
+  background: rgba(20, 23, 33, 0.8);
+  border: 1px solid rgba(0, 240, 255, 0.25);
   transition: all var(--transition-fast);
 }
 
 .brand-logo-btn:hover {
-  background: rgba(255, 106, 0, 0.16);
-  border-color: var(--vlc-orange);
-  box-shadow: 0 0 12px var(--vlc-orange-glow);
+  background: rgba(20, 23, 33, 1);
+  border-color: var(--pav-cyan);
+  box-shadow: 0 0 16px var(--pav-cyan-glow);
 }
 
-.vlc-cone-icon {
-  width: 24px;
-  height: 24px;
-  filter: drop-shadow(0 2px 6px rgba(255, 106, 0, 0.5));
+.pav-logo-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  filter: drop-shadow(0 2px 8px rgba(0, 240, 255, 0.4));
+  transition: transform var(--transition-fast);
+}
+
+.brand-logo-btn:hover .pav-logo-icon {
+  transform: scale(1.08);
+}
+
+.brand-title-group {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
 }
 
 .brand-title {
   font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -0.2px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
   color: var(--text-primary);
 }
 
-.brand-title span {
-  color: var(--vlc-orange);
+.brand-title .brand-gradient {
+  background: var(--pav-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-tagline {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
 }
 
 /* Classic Menu Bar Modernized */

@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VLC Plus - The Modern Media Player</title>
-  <meta name="description" content="A complete conceptual overhaul of VLC Media Player featuring Juxtopposed UX principles, traffic cone visual identity, thick scrubbing seekbar, left-aligned controls, and visual subtitle sync timeline.">
+  <title>PAV — Play Any Video</title>
+  <meta name="description" content="PAV (Play Any Video) - A complete conceptual overhaul of VLC Media Player featuring Juxtopposed UX principles, electric cyan & indigo styling, thick scrubbing seekbar, and visual sync timeline.">
   
-  <!-- Modern Google Fonts -->
-  <link rel="icon" type="image/jpeg" href="favicon.jpg">
+  <!-- Modern Google Fonts & PAV Favicon -->
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -26,17 +26,13 @@
     <!-- Top Window & Navigation Header (Auto-hides on inactivity) -->
     <header class="player-header" id="player-header">
       <div class="header-left">
-        <!-- Modern Traffic Cone Brand Logo -->
-        <button class="brand-logo-btn" data-tooltip="VLC Plus Modern Media Player">
-          <svg class="vlc-cone-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <ellipse cx="32" cy="56" rx="28" ry="6" fill="#D45500" />
-            <path d="M12 55L24 16H40L52 55H12Z" fill="#FF6A00" />
-            <path d="M17 48L20 40H44L47 48H17Z" fill="#FFFFFF" />
-            <path d="M22 34L25 24H39L42 34H22Z" fill="#FFFFFF" />
-            <ellipse cx="32" cy="16" rx="8" ry="3" fill="#FF8024" />
-            <path d="M24 16L32 6L40 16H24Z" fill="#FF8024" />
-          </svg>
-          <span class="brand-title">VLC<span>+</span></span>
+        <!-- PAV Official Brand Logo -->
+        <button class="brand-logo-btn" data-tooltip="PAV — Play Any Video">
+          <img src="logo.svg" alt="PAV Logo" class="pav-logo-icon" />
+          <div class="brand-title-group">
+            <span class="brand-title"><span class="brand-gradient">PAV</span></span>
+            <span class="brand-tagline">Play Any Video</span>
+          </div>
         </button>
 
         <!-- Classic VLC Menu Bar Redesigned -->
@@ -200,18 +196,18 @@
 
         <div style="width: 1px; height: 18px; background: var(--border-subtle); margin: 0 4px;"></div>
 
-        <!-- Window System Mock Controls -->
-        <button class="header-action-btn" title="Minimize">
+        <!-- Window System Controls (Electron Native Desktop Hooked) -->
+        <button class="header-action-btn" id="win-btn-minimize" title="Minimize">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="5" y1="12" x2="19" y2="12"></line>
           </svg>
         </button>
-        <button class="header-action-btn" title="Maximize">
+        <button class="header-action-btn" id="win-btn-maximize" title="Maximize">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
           </svg>
         </button>
-        <button class="header-action-btn window-ctrl-close" title="Close">
+        <button class="header-action-btn window-ctrl-close" id="win-btn-close" title="Close">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>

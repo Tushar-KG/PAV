@@ -14,6 +14,12 @@
   --vlc-cone-white: #FFFFFF;
   --vlc-cone-stripe: #E5E7EB;
 
+  /* PAV (Play Any Video) Electric Cyan & Violet Identity */
+  --pav-cyan: #00F0FF;
+  --pav-violet: #7000FF;
+  --pav-cyan-glow: rgba(0, 240, 255, 0.45);
+  --pav-gradient: linear-gradient(135deg, #00F0FF 0%, #7000FF 100%);
+
   /* Surface & Background Colors */
   --bg-main: #0B0D12;
   --bg-elevated: #11141D;

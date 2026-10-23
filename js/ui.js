@@ -169,6 +169,41 @@ class VLCUI {
   handleMenuAction(action) {
     switch (action) {
       case 'open-file':
+        if (window.electronAPI) {
+          window.electronAPI.openFileDialog().then(paths => {
+            if (paths && paths.length > 0) {
+              paths.forEach(filePath => {
+                const fileName = filePath.split(/[\\/]/).pop();
+                const ext = fileName.split('.').pop().toLowerCase();
+                const isAudio = ['mp3', 'flac', 'wav', 'ogg', 'm4a', 'aac'].includes(ext);
+                const isSub = ['srt', 'vtt', 'sub'].includes(ext);
+
+                if (isSub) {
+                  fetch(`file://${filePath.replace(/\\/g, '/')}`).then(r => r.text()).then(txt => {
+                    this.player.subtitles.loadSubtitlesFromText(txt, fileName);
+                    this.player.showOSD(`Subtitles: ${fileName}`);
+                  });
+                } else {
+                  const newItem = {
+                    id: `file-${Date.now()}`,
+                    title: fileName,
+                    artist: 'Local Media',
+                    type: isAudio ? 'audio' : 'video',
+                    duration: 'Local File',
+                    codec: ext.toUpperCase(),
+                    src: `file://${filePath.replace(/\\/g, '/')}`,
+                    poster: isAudio ? 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80' : '',
+                    hasSubtitles: false
+                  };
+                  this.player.queue.addToQueue(newItem, true);
+                }
+              });
+            }
+          });
+          break;
+        }
+        this.openModal('modal-open-media');
+        break;
       case 'open-media':
         this.openModal('modal-open-media');
         break;

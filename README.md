@@ -1,20 +1,24 @@
-# VLC Plus (PAV) — Modern Media Player Redesign
+# PAV — Play Any Video
 
-> **A complete conceptual overhaul of VLC Media Player**, inspired by UX/UI designer **Juxtopposed’s** *["I Redesigned VLC After 25 Years"](https://www.youtube.com/watch?v=ERFeOgqk324)*.
+<p align="center">
+  <img src="logo.svg" alt="PAV Logo" width="160" height="160" />
+  <br>
+  <b>Play Any Video. Any Codec. Modern Interface.</b>
+</p>
 
-![VLC Plus Modern Traffic Cone Icon](favicon.jpg)
+> **PAV (Play Any Video)** is a complete conceptual overhaul of VLC Media Player, inspired by UX/UI designer **Juxtopposed’s** *["I Redesigned VLC After 25 Years"](https://www.youtube.com/watch?v=ERFeOgqk324)*.
 
 ---
 
-## 🌟 Why VLC Plus?
+## 🌟 Why PAV?
 
-While celebrating VLC's unmatched ability to play almost any codec across every platform, decades of feature additions and redundant dialogs have made its interface notoriously cluttered. **VLC Plus** redesigns the player from the ground up:
+While celebrating the ability to play almost any codec across every platform, decades of feature additions and redundant dialogs have made legacy media player interfaces notoriously cluttered. **PAV** redesigns the media player from the ground up:
 
-- **Iconic Visual Identity**: Preserves the signature traffic cone with glowing orange accents (`#FF6A00`) and modern dark graphite surfaces (`#0B0D12`).
+- **Minimalist P-Play Visual Identity**: A sleek matte dark slate tile (`#141721` to `#0B0D13`) featuring an electric cyan to indigo playmark (`#00F0FF` → `#7000FF`).
 - **Utilitarian Softened Rectangles**: Clean precision-radiused geometry rather than generic pill-shaped streaming bubbles.
 - **Left-Aligned Playback Cluster**: Play/Pause, ±10s jumps, Prev/Next, Stop, Loop, Shuffle, and A-B Loop all grouped on the left for intuitive control and content visibility.
 - **Thick Scrubbing Seek Bar**: Audio waveform peak visualizer, live hover timecode preview, and dynamic A-B repeat markers.
-- **Stylized Traffic Cone Volume Meter**: Stepped volume slider capable of VLC's legendary **200% overdrive boost**.
+- **Stylized Volume Meter (Up to 200%)**: Stepped volume slider capable of legendary **200% overdrive boost**.
 - **Interactive Visual Subtitle & Audio Sync Timeline**: Drag subtitle blocks directly on an interactive timeline instead of typing obscure millisecond numbers.
 - **In-Player Slide-Out Library**: Collapsible queue and media collection drawer that doesn't interrupt video playback.
 - **Interactive Toolbar Layout Customizer**: Switch between *Standard*, *Minimalist*, and *Pro Editor* toolbar layouts, or toggle individual widgets.
@@ -68,7 +72,7 @@ Simply double-click `index.html` to open it directly in Firefox or any modern we
 ## 📁 Project Architecture
 
 ```
-vlcplus/
+pav/
 ├── index.html            # Semantic HTML5 architecture & UI modals
 ├── favicon.jpg           # High-resolution modern 3D traffic cone icon
 ├── css/
